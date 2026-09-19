@@ -119,7 +119,7 @@ export const LandingPage: React.FC = () => {
               </button>
             )}
             <button
-              onClick={() => navigateTo('workspace')}
+              onClick={() => navigateTo('auth')}
               className="text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-apple-glow transition flex items-center space-x-1.5 whitespace-nowrap"
             >
               <span>Launch</span>
@@ -157,14 +157,14 @@ export const LandingPage: React.FC = () => {
           {/* Primary Action Row */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
             <button
-              onClick={() => navigateTo('workspace')}
+              onClick={() => navigateTo('auth')}
               className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold text-sm shadow-apple-glow hover:brightness-110 active:scale-95 transition flex items-center justify-center space-x-2 group"
             >
               <span>Launch Spatial Studio Free</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
             </button>
             <button
-              onClick={() => navigateTo('dashboard')}
+              onClick={() => navigateTo('auth')}
               className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl border font-medium text-sm backdrop-blur-lg active:scale-95 transition flex items-center justify-center space-x-2 ${
                 isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm' : 'bg-white/5 hover:bg-white/10 border-white/15 text-white'
               }`}
