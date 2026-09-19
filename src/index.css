@@ -1,0 +1,391 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 8%, #161722 0%, #090a0f 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light / Day Mode Theme Overrides */
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background: #f4f6f9;
+  color: #0f172a;
+}
+
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  color: #0f172a;
+}
+
+html.light .glass-panel-light {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  color: #0f172a;
+}
+
+html.light .glass-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  color: #0f172a;
+}
+
+html.light .glass-card:hover {
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .canvas-grid {
+  background-color: #f1f3f7 !important;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.16) 1.5px, transparent 1.5px) !important;
+}
+
+/* Light Mode Text Legibility */
+html.light .text-white {
+  color: #0f172a;
+}
+html.light .text-slate-100 {
+  color: #0f172a;
+}
+html.light .text-slate-200 {
+  color: #1e293b;
+}
+html.light .text-slate-300 {
+  color: #334155;
+}
+html.light .text-slate-400 {
+  color: #64748b;
+}
+
+/* Preserve bright white text on solid buttons, badges & active primary pills */
+html.light .bg-blue-600,
+html.light .bg-blue-500,
+html.light .bg-indigo-600,
+html.light .bg-indigo-500,
+html.light .bg-rose-600,
+html.light .bg-emerald-600,
+html.light [class*="bg-gradient-to"],
+html.light button.bg-blue-600,
+html.light button[class*="from-blue"] {
+  color: #ffffff !important;
+}
+
+html.light .bg-blue-600 .text-white,
+html.light .bg-blue-500 .text-white,
+html.light .bg-indigo-600 .text-white,
+html.light .bg-indigo-500 .text-white,
+html.light [class*="bg-gradient-to"] .text-white,
+html.light [class*="from-blue"] .text-white,
+html.light .bg-blue-600 span,
+html.light .bg-indigo-600 span,
+html.light [class*="from-blue"] span {
+  color: #ffffff !important;
+}
+
+/* Light Mode Borders and Translucent Backdrops */
+html.light .border-white\/10,
+html.light .border-white\/15,
+html.light .border-white\/20,
+html.light .border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .bg-black\/20,
+html.light .bg-black\/30,
+html.light .bg-black\/35,
+html.light .bg-black\/40,
+html.light .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light .bg-white\/5,
+html.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light .hover\:bg-white\/5:hover,
+html.light .hover\:bg-white\/10:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .bg-\[\#0c0d14\],
+html.light .bg-\[\#07080f\],
+html.light .bg-\[\#0b0c10\],
+html.light .bg-\[\#161722\] {
+  background-color: #f4f6f9 !important;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+/* Apple Liquid Glass Panels */
+.glass-panel {
+  background: rgba(20, 21, 28, 0.72);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(28, 30, 40, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Ephemeral AI Ghost Card */
+.ghost-card {
+  background: rgba(79, 70, 229, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px dashed rgba(129, 140, 248, 0.6);
+  box-shadow: 0 0 35px rgba(99, 102, 241, 0.28);
+  animation: ghost-pulse 3s infinite alternate ease-in-out;
+}
+
+@keyframes ghost-pulse {
+  0% {
+    border-color: rgba(129, 140, 248, 0.4);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+  100% {
+    border-color: rgba(165, 180, 252, 0.85);
+    box-shadow: 0 0 35px rgba(99, 102, 241, 0.4);
+  }
+}
+
+/* Infinite Canvas Page Designs */
+.canvas-design-dots {
+  background-size: 32px 32px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.09) 1.5px, transparent 1.5px);
+  background-color: #0b0c13;
+}
+
+html.light .canvas-design-dots {
+  background-size: 32px 32px;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.16) 1.5px, transparent 1.5px);
+  background-color: #f1f3f7;
+}
+
+.canvas-design-graph {
+  background-size: 24px 24px, 120px 120px;
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+    linear-gradient(to right, rgba(56, 189, 248, 0.22) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.22) 1.5px, transparent 1.5px);
+  background-color: #090e1a;
+}
+
+html.light .canvas-design-graph {
+  background-size: 24px 24px, 120px 120px;
+  background-image: 
+    linear-gradient(to right, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    linear-gradient(to right, rgba(14, 165, 233, 0.26) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(14, 165, 233, 0.26) 1.5px, transparent 1.5px);
+  background-color: #f0f6fc;
+}
+
+.canvas-design-cornell {
+  background-color: #0e0f17;
+  background-size: 100% 30px;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+html.light .canvas-design-cornell {
+  background-color: #fdfdfd;
+  background-size: 100% 30px;
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+}
+
+.canvas-design-minimal {
+  background-color: #0b0c10;
+  background-size: 100% 34px;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+html.light .canvas-design-minimal {
+  background-color: #fafbfc;
+  background-size: 100% 34px;
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+.canvas-design-nebula {
+  background: 
+    radial-gradient(circle at 18% 25%, rgba(99, 102, 241, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 82% 75%, rgba(217, 70, 239, 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.16) 0%, transparent 55%),
+    #060812;
+}
+
+html.light .canvas-design-nebula {
+  background: 
+    radial-gradient(circle at 18% 25%, rgba(165, 180, 252, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 82% 75%, rgba(244, 114, 182, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(186, 230, 253, 0.35) 0%, transparent 55%),
+    #f3f6fa;
+}
+
+.canvas-design-sepia {
+  background-color: #1e1812;
+  background-size: 28px 28px;
+  background-image: radial-gradient(circle, rgba(245, 158, 11, 0.14) 1.5px, transparent 1.5px);
+}
+
+html.light .canvas-design-sepia {
+  background-color: #f7f1e5;
+  background-size: 28px 28px;
+  background-image: radial-gradient(circle, rgba(180, 83, 9, 0.16) 1.5px, transparent 1.5px);
+}
+
+/* PDF Page Reading Filters for Eye-Comfort */
+.pdf-filter-normal {
+  filter: none;
+}
+
+.pdf-filter-sepia {
+  filter: sepia(0.42) contrast(104%) brightness(96%) saturate(120%);
+}
+
+.pdf-filter-dark-invert {
+  filter: invert(90%) hue-rotate(180deg) contrast(115%) brightness(92%);
+}
+
+.pdf-filter-soft-contrast {
+  filter: invert(85%) hue-rotate(190deg) contrast(128%) brightness(86%);
+}
+
+/* Puzzle Snapping & Docking Indicator */
+.puzzle-docked {
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.7), 0 12px 28px rgba(16, 185, 129, 0.25) !important;
+}
+
+.puzzle-snap-active {
+  box-shadow: 0 0 0 3px #10b981, 0 0 30px rgba(16, 185, 129, 0.5) !important;
+  transition: box-shadow 0.1s ease;
+}
+
+/* Interactive Split Resizer */
+.resizer-divider {
+  transition: background-color 0.15s ease, width 0.15s ease;
+}
+.resizer-divider:hover,
+.resizer-divider.dragging {
+  background-color: rgba(59, 130, 246, 0.7) !important;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* Pulse animation for active citations */
+.anchor-flash {
+  animation: flash-highlight 1.6s ease-out;
+}
+
+@keyframes flash-highlight {
+  0% {
+    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.8);
+    background-color: rgba(251, 191, 36, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+    background-color: rgba(251, 191, 36, 0.15);
+  }
+}
+
+/* Ambient Reading Desk Environment (Beautified Area Around PDF) */
+.reading-desk-dark {
+  background: radial-gradient(ellipse 90% 60% at 50% 28%, #171b29 0%, #0d0f17 55%, #08090e 100%);
+}
+
+.reading-desk-light {
+  background: radial-gradient(ellipse 90% 60% at 50% 20%, #ffffff 0%, #f0f3f8 55%, #e4e8f1 100%);
+}
+
+.reading-desk-grid-dark {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.reading-desk-grid-light {
+  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Apple-Grade Realistic Paper Elevation & Ambient Drop Shadow */
+.paper-sheet-dark {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 12px 32px -4px rgba(0, 0, 0, 0.7),
+    0 30px 70px -10px rgba(0, 0, 0, 0.85),
+    0 0 80px -20px rgba(59, 130, 246, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.paper-sheet-light {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 12px 28px -4px rgba(15, 23, 42, 0.09),
+    0 28px 64px -12px rgba(15, 23, 42, 0.13),
+    0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+/* Fluid Zoom Scaling Transition */
+.zoom-viewport-sheet {
+  transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform;
+}
+
