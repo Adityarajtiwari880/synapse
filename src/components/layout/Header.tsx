@@ -102,11 +102,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="h-4 w-px bg-white/15 mx-1 hidden sm:block"></div>
 
         {/* View Switcher Tabs */}
-        <nav className="flex p-0.5 rounded-xl bg-black/35 border border-white/5 text-xs font-medium">
+        <nav className="flex p-0.5 rounded-xl bg-black/35 border border-white/5 text-xs font-medium overflow-x-auto overflow-y-hidden max-w-[40vw] sm:max-w-[50vw] md:max-w-none no-scrollbar">
           <button
             onClick={() => setActiveView('dashboard')}
             title="Workspace Hub — View all your projects, files & quick tools"
-            className={`px-2.5 sm:px-3 py-1 rounded-lg transition ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
               activeView === 'dashboard'
                 ? 'bg-white/15 text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-white'
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => setActiveView('workspace')}
             title="Reading Board — Read PDFs, snip notes & organize visual cards"
-            className={`px-2.5 sm:px-3 py-1 rounded-lg transition ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
               activeView === 'workspace'
                 ? 'bg-white/15 text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-white'
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => setActiveView('library')}
             title="All Files — Manage all your uploaded PDF documents"
-            className={`px-2.5 sm:px-3 py-1 rounded-lg transition ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
               activeView === 'library'
                 ? 'bg-white/15 text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-white'
@@ -139,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => setActiveView('matrix')}
             title="Compare Table — Compare clauses and citations side-by-side"
-            className={`px-2.5 sm:px-3 py-1 rounded-lg transition ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
               activeView === 'matrix'
                 ? 'bg-white/15 text-white shadow-sm font-semibold'
                 : 'text-slate-400 hover:text-white'

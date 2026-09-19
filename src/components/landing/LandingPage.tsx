@@ -66,7 +66,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className={`hidden md:flex items-center space-x-7 text-xs font-medium ${navText}`}>
+          <div className={`hidden lg:flex items-center space-x-7 text-xs font-medium ${navText}`}>
             <button onClick={() => navigateTo('dashboard')} className="transition">
               Dossiers &amp; Matters
             </button>
@@ -96,7 +96,7 @@ export const LandingPage: React.FC = () => {
               title={isLight ? 'Switch to Night Mode' : 'Switch to Day Mode'}
             >
               {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-400" />}
-              <span className="hidden sm:inline">{isLight ? 'Night' : 'Day'}</span>
+              <span className="hidden lg:inline">{isLight ? 'Night' : 'Day'}</span>
             </button>
 
             {isAuthenticated ? (
@@ -111,7 +111,7 @@ export const LandingPage: React.FC = () => {
             ) : (
               <button
                 onClick={() => navigateTo('auth')}
-                className={`text-xs font-medium px-3.5 py-1.5 rounded-xl transition ${
+                className={`hidden sm:block text-xs font-medium px-3.5 py-1.5 rounded-xl transition ${
                   isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-300 hover:text-white'
                 }`}
               >
@@ -120,10 +120,11 @@ export const LandingPage: React.FC = () => {
             )}
             <button
               onClick={() => navigateTo('workspace')}
-              className="text-xs font-semibold px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-apple-glow transition flex items-center space-x-1.5"
+              className="text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-apple-glow transition flex items-center space-x-1.5 whitespace-nowrap"
             >
-              <span>Launch Workspace</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Launch</span>
+              <span className="hidden sm:inline"> Workspace</span>
+              <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
             </button>
           </div>
         </div>
