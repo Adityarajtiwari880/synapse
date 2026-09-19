@@ -683,6 +683,13 @@ export const PersonalizedDashboard: React.FC = () => {
                       <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                         {matter.status}
                       </span>
+                      <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full flex items-center space-x-1 ${
+                        matter.workflowMode === 'ai_assistant' 
+                          ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400' 
+                          : 'bg-slate-500/15 text-slate-600 dark:text-slate-400'
+                      }`}>
+                        {matter.workflowMode === 'ai_assistant' ? 'AI Co-Pilot' : 'Manual Studio'}
+                      </span>
                     </div>
                     <div className="text-[11px] text-slate-400 flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
