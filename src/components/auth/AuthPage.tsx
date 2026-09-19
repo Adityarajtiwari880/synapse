@@ -7,6 +7,7 @@ import {
   User,
   Fingerprint,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
   Building,
   KeyRound,
@@ -16,7 +17,8 @@ import {
   Globe,
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
@@ -58,6 +60,41 @@ export const AuthPage: React.FC = () => {
       setShowLoginLoader(false);
       navigateTo('dashboard');
     }, 2000);
+  };
+
+  const handleGuestLogin = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    const tempEmail = `guest_${Date.now()}@test.com`;
+    const tempPass = `guest_pass_1234`;
+    
+    // Attempt sign up. Because it's a test, we assume email confirm is disabled or they just want a mock session.
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: tempEmail,
+      password: tempPass,
+      options: { data: { name: 'Guest Tester' } }
+    });
+    
+    if (signUpError) {
+      // If it fails (e.g. rate limit), fallback to local mock login if we want, but since they want to test, we show the error.
+      setError(signUpError.message);
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Try to sign in just in case signUp didn't auto sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: tempEmail,
+      password: tempPass
+    });
+    
+    if (signInError) {
+      setError("Account created but email confirmation is required. Please disable 'Confirm Email' in Supabase.");
+      setIsSubmitting(false);
+    } else {
+      switchField(selectedCategory);
+      handleAuthSuccess();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,11 +240,13 @@ export const AuthPage: React.FC = () => {
           <span className="text-slate-400 hidden sm:inline">Protected by End-to-End Local Enclave</span>
           <button
             onClick={() => navigateTo('landing')}
-            className={`px-3 py-1.5 rounded-xl border transition ${
-              isLight ? 'border-slate-300 text-slate-700 hover:bg-slate-100' : 'border-white/15 text-slate-300 hover:text-white hover:bg-white/5'
+            className={`px-3 py-1.5 rounded-xl border transition flex items-center space-x-1.5 ${
+              isLight ? 'border-slate-300 text-slate-700 hover:bg-slate-100 shadow-sm' : 'bg-white/5 hover:bg-white/10 border-white/15 text-slate-200 backdrop-blur-md'
             }`}
+            title="Back to Overview"
           >
-            Back to Overview
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Back to Overview</span>
           </button>
         </div>
       </header>
@@ -226,6 +265,7 @@ export const AuthPage: React.FC = () => {
                   onClick={() => {
                     setMode('login');
                     setError(null);
+                    setSuccessMsg(null);
                   }}
                   className={`px-4 py-1.5 rounded-lg transition ${
                     mode === 'login'
@@ -240,6 +280,7 @@ export const AuthPage: React.FC = () => {
                   onClick={() => {
                     setMode('register');
                     setError(null);
+                    setSuccessMsg(null);
                   }}
                   className={`px-4 py-1.5 rounded-lg transition ${
                     mode === 'register'
@@ -315,6 +356,17 @@ export const AuthPage: React.FC = () => {
               >
                 <Fingerprint className="w-4 h-4 text-blue-500" />
                 <span>Sign in with Apple Touch ID / Passkey</span>
+              </button>
+              
+              {/* Skip Login / Guest Access Button */}
+              <button
+                type="button"
+                onClick={handleGuestLogin}
+                disabled={isSubmitting}
+                className="w-full p-2.5 rounded-xl bg-gradient-to-r from-emerald-600/20 to-teal-600/20 hover:from-emerald-600/30 hover:to-teal-600/30 border border-emerald-500/30 text-xs font-bold text-emerald-400 transition flex items-center justify-center space-x-2 shadow-inner"
+              >
+                <Zap className="w-4 h-4 text-emerald-400" />
+                <span>Skip Login & Test Platform (Guest)</span>
               </button>
             </div>
 
