@@ -77,6 +77,20 @@ export const PersonalizedDashboard: React.FC = () => {
     updateAppSettings({ theme: isLight ? 'dark' : 'light' });
   };
 
+  const { logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogoutFlow = () => {
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      logout();
+      navigateTo('landing');
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }, 2000);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -292,8 +306,62 @@ export const PersonalizedDashboard: React.FC = () => {
               Admin Portal
             </button>
           )}
+
+          {/* Logout Button */}
+          <button
+            onClick={() => setShowLogoutConfirm(true)}
+            className={`px-3 py-1.5 rounded-xl border transition flex items-center space-x-1.5 ${
+              isLight
+                ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-600 shadow-sm'
+                : 'bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400'
+            }`}
+            title="Log Out"
+          >
+            <span className="font-semibold">Log Out</span>
+          </button>
         </div>
       </header>
+
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-200">
+          <div className={`p-8 rounded-3xl border shadow-2xl max-w-sm w-full mx-4 text-center ${
+            isLight ? 'bg-white/90 border-slate-200 text-slate-900' : 'bg-black/80 border-white/10 text-white'
+          }`}>
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-apple-glow">
+              <Layers className="w-8 h-8 text-red-500" />
+            </div>
+            
+            {isLoggingOut ? (
+              <div className="space-y-2 animate-in fade-in duration-300">
+                <h3 className="text-xl font-bold">Logging Out...</h3>
+                <p className="text-sm text-slate-400">Please wait a moment.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Sign Out</h3>
+                  <p className="text-sm text-slate-400">Are you sure you want to log out of your Spatial Research Workspace?</p>
+                </div>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setShowLogoutConfirm(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 font-semibold transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleLogoutFlow}
+                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold shadow-lg transition"
+                  >
+                    Yes, Log Out
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Upload Toast */}
       {uploadToast && (
