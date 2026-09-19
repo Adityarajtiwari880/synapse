@@ -284,7 +284,7 @@ export function analyzeDocumentGroundedLocal(doc: DocumentItem): GroundedAnalysi
     {
       title: `Critical Inquiry · ${title.slice(0, 20)}`,
       content: criticalInquiries[0],
-      type: 'inquiry'
+      type: 'question'
     }
   ];
 

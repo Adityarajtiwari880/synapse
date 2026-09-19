@@ -405,6 +405,28 @@ export const PersonalizedDashboard: React.FC = () => {
                   ⚡ Concise
                 </button>
               </div>
+
+              {/* Workflow Mode Quick Toggle */}
+              <div className="flex items-center p-1 rounded-xl bg-black/5 dark:bg-black/30 border border-black/10 dark:border-white/10 text-[11px]">
+                <button
+                  onClick={() => updateAppSettings({ workflowMode: 'manual' })}
+                  className={`px-2.5 py-1 rounded-lg transition font-semibold ${
+                    appSettings.workflowMode === 'manual' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Manual Studio – full control, no AI suggestions"
+                >
+                  ✍️ Manual
+                </button>
+                <button
+                  onClick={() => updateAppSettings({ workflowMode: 'ai_assistant' })}
+                  className={`px-2.5 py-1 rounded-lg transition font-semibold ${
+                    appSettings.workflowMode === 'ai_assistant' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="AI Co-Pilot – grounded AI analyzes your document and suggests insights"
+                >
+                  ✨ AI Co-Pilot
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -888,6 +910,65 @@ export const PersonalizedDashboard: React.FC = () => {
                 />
               </div>
 
+              {/* Workflow Mode Selector */}
+              <div>
+                <label className={`block text-xs font-semibold mb-2 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                  How do you want to work?
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setNewWorkflowMode('manual')}
+                    className={`p-3.5 rounded-2xl border text-left transition ${
+                      newWorkflowMode === 'manual'
+                        ? 'border-slate-500 bg-slate-700/20 ring-2 ring-slate-500/40'
+                        : isLight
+                          ? 'border-slate-200 bg-slate-50 hover:border-slate-400'
+                          : 'border-white/10 bg-white/[0.03] hover:border-white/25'
+                    }`}
+                  >
+                    <div className="text-xl mb-1">✍️</div>
+                    <div className={`text-xs font-bold mb-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>Manual Studio</div>
+                    <div className={`text-[10px] leading-snug ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                      Full control. You crop, connect, and annotate everything yourself.
+                    </div>
+                    {newWorkflowMode === 'manual' && (
+                      <div className="mt-2 text-[10px] font-semibold text-slate-400 flex items-center space-x-1">
+                        <CheckCircle2 className="w-3 h-3 text-slate-400" />
+                        <span>Selected</span>
+                      </div>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewWorkflowMode('ai_assistant')}
+                    className={`p-3.5 rounded-2xl border text-left transition ${
+                      newWorkflowMode === 'ai_assistant'
+                        ? 'border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30'
+                        : isLight
+                          ? 'border-slate-200 bg-slate-50 hover:border-purple-400'
+                          : 'border-white/10 bg-white/[0.03] hover:border-purple-500/40'
+                    }`}
+                  >
+                    <div className="text-xl mb-1">✨</div>
+                    <div className={`text-xs font-bold mb-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>AI Co-Pilot</div>
+                    <div className={`text-[10px] leading-snug ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                      Grounded AI reads your document and suggests insights, summaries, and citations instantly.
+                    </div>
+                    {newWorkflowMode === 'ai_assistant' && (
+                      <div className="mt-2 text-[10px] font-semibold text-purple-400 flex items-center space-x-1">
+                        <CheckCircle2 className="w-3 h-3 text-purple-400" />
+                        <span>Selected</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+                <p className={`text-[10px] mt-1.5 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+                  You can switch modes anytime from Quick Settings.
+                </p>
+              </div>
+
               <div className="pt-2 flex justify-end space-x-2">
                 <button
                   type="button"
@@ -900,7 +981,7 @@ export const PersonalizedDashboard: React.FC = () => {
                   type="submit"
                   className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-apple-glow"
                 >
-                  Create & Open Board
+                  Create &amp; Open Board
                 </button>
               </div>
             </form>
