@@ -20,52 +20,17 @@ interface AuthContextType {
   supabaseUserId: string | null;
 }
 
-// ─── Fallback mock users (used when Supabase not configured) ──
-const MOCK_USERS: User[] = [
-  {
-    id: 'usr-admin',
-    name: 'Aditya Raj Tiwari',
-    email: 'aditya@synapse.ai',
-    role: 'admin',
-    status: 'active',
-    createdAt: '2026-09-01',
-    lastActive: 'Just now',
-  },
-  {
-    id: 'usr-res1',
-    name: 'Dr. Elena Rostova',
-    email: 'elena@oxford.edu',
-    role: 'researcher',
-    status: 'active',
-    createdAt: '2026-09-05',
-    lastActive: '15m ago',
-  },
-];
-
-const MOCK_SESSIONS: ActiveSession[] = [
-  {
-    id: 'sess-1',
-    userId: 'usr-admin',
-    userName: 'Aditya Raj Tiwari',
-    device: 'MacBook Pro 16" (M3 Max)',
-    browser: 'Chrome · Windows 11',
-    ip: '192.168.1.104',
-    lastActive: 'Active Now',
-    isCurrent: true,
-  },
-];
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('synapse_users');
-    return saved ? JSON.parse(saved) : MOCK_USERS;
+    return saved ? JSON.parse(saved) : [];
   });
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(() => {
     const saved = localStorage.getItem('synapse_sessions');
-    return saved ? JSON.parse(saved) : MOCK_SESSIONS;
+    return saved ? JSON.parse(saved) : [];
   });
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,8 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (savedId) {
         const match = users.find((u) => u.id === savedId);
         if (match) setCurrentUser(match);
-      } else {
-        setCurrentUser(users[0]); // default to admin for demo
       }
       setLoading(false);
       return;
@@ -142,6 +105,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setLoading(false);
   };
+
+  // ─── Fetch All Profiles for Admin Portal ──────────────────
+  useEffect(() => {
+    if (isSupabaseConfigured && currentUser?.role === 'admin') {
+      supabase.from('profiles').select('*').then(({ data }) => {
+        if (data) {
+          const mappedUsers: User[] = data.map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            email: d.email,
+            role: d.role as Role,
+            status: 'active',
+            createdAt: d.created_at,
+            lastActive: 'Recently'
+          }));
+          setUsers(mappedUsers);
+        }
+      });
+    }
+  }, [currentUser]);
 
   // ─── Persist local users ──────────────────────────────────
   useEffect(() => {

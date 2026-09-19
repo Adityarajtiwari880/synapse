@@ -96,16 +96,6 @@ export const AuthPage: React.FC = () => {
     }
   };
 
-  const handleQuickPersona = async (personaEmail: string, category: ProfessionalField) => {
-    setEmail(personaEmail);
-    setPassword('enterprise123');
-    setIsSubmitting(true);
-    switchField(category);
-    await login(personaEmail, 'enterprise123');
-    setIsSubmitting(false);
-    navigateTo('dashboard');
-  };
-
   return (
     <div className={`min-h-screen flex flex-col font-sans selection:bg-blue-500/30 selection:text-white relative overflow-hidden transition-colors duration-200 ${
       isLight ? 'bg-[#f5f5f7] text-slate-900' : 'bg-[#07080f] text-slate-100'
@@ -225,7 +215,7 @@ export const AuthPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => handleQuickPersona('aditya@synapse.ai', 'legal')}
+                  onClick={() => alert("Enterprise SSO requires configuration in Supabase Dashboard. Please use Email/Password.")}
                   className={`p-2.5 rounded-xl border text-xs font-medium transition flex items-center justify-center space-x-2 ${
                     isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
                   }`}
@@ -235,7 +225,7 @@ export const AuthPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleQuickPersona('elena@oxford.edu', 'academic')}
+                  onClick={() => alert("Enterprise SSO requires configuration in Supabase Dashboard. Please use Email/Password.")}
                   className={`p-2.5 rounded-xl border text-xs font-medium transition flex items-center justify-center space-x-2 ${
                     isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
                   }`}
@@ -367,44 +357,7 @@ export const AuthPage: React.FC = () => {
               </button>
             </form>
 
-            {/* ONE-CLICK TEST PERSONAS */}
-            <div className={`pt-2 border-t space-y-2 ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider text-center">
-                1-Click Quick Evaluation Personas
-              </div>
-              <div className="grid grid-cols-3 gap-1.5 text-[10px]">
-                <button
-                  type="button"
-                  onClick={() => handleQuickPersona('aditya@synapse.ai', 'legal')}
-                  className={`p-1.5 rounded-lg text-center border transition ${
-                    isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/5 text-slate-300'
-                  }`}
-                >
-                  <div className={`font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>⚖️ Partner</div>
-                  <div className="text-[9px] text-blue-500">Legal · Admin</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickPersona('elena@oxford.edu', 'academic')}
-                  className={`p-1.5 rounded-lg text-center border transition ${
-                    isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/5 text-slate-300'
-                  }`}
-                >
-                  <div className={`font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>🔬 Researcher</div>
-                  <div className="text-[9px] text-cyan-500">Academic · Editor</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickPersona('marcus@mit.edu', 'business')}
-                  className={`p-1.5 rounded-lg text-center border transition ${
-                    isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/5 text-slate-300'
-                  }`}
-                >
-                  <div className={`font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>💼 Analyst</div>
-                  <div className="text-[9px] text-purple-500">Finance · Reviewer</div>
-                </button>
-              </div>
-            </div>
+
 
             {/* Security Guarantee */}
             <div className="text-center pt-2 text-[10px] text-slate-400 flex items-center justify-center space-x-1.5">
