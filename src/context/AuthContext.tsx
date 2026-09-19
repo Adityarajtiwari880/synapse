@@ -207,16 +207,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ─── PASSKEY (Apple Touch ID simulation) ─────────────────
   const loginWithPasskey = async (): Promise<boolean> => {
-    await new Promise((res) => setTimeout(res, 400));
-    if (!isSupabaseConfigured) {
-      const adminUser = users.find((u) => u.role === 'admin') || users[0];
-      setCurrentUser(adminUser);
-      return true;
+    if (isSupabaseConfigured) {
+      // Trigger actual Supabase Apple OAuth (or passkey if configured)
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+      });
+      if (error) {
+        alert(error.message);
+        return false;
+      }
+      return true; // The redirect will handle the rest
     }
-    // Future: WebAuthn via supabase.auth.signInWithOtp / passkey API
-    const adminUser = users.find((u) => u.role === 'admin') || users[0];
-    setCurrentUser(adminUser);
-    return true;
+    
+    alert('WebAuthn / Apple ID requires a verified domain in Supabase. Please sign in with Email & Password for now.');
+    return false;
   };
 
   // ─── LOGOUT ───────────────────────────────────────────────

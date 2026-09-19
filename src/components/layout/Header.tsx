@@ -71,6 +71,19 @@ export const Header: React.FC<HeaderProps> = ({
   } = useWorkspace();
 
 
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogoutFlow = () => {
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      logout();
+      setActiveView('landing');
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }, 2000);
+  };
+
   const cycleSplitLayout = () => {
     if (splitLayout === '50/50') setSplitLayout('70/30');
     else if (splitLayout === '70/30') setSplitLayout('30/70');
@@ -266,7 +279,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </button>
             <button
-              onClick={logout}
+              onClick={() => setShowLogoutConfirm(true)}
               className="p-1.5 rounded-full text-slate-400 hover:text-rose-400 hover:bg-white/10 transition"
               title="Sign Out"
             >
@@ -282,8 +295,56 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Sign In</span>
           </button>
         )}
-
       </div>
+
+      {/* Logout Confirmation & Loader Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-200 font-sans">
+          <div className={`p-8 rounded-3xl border flex flex-col items-center text-center max-w-sm w-full mx-4 shadow-2xl ${
+            appSettings.theme === 'light' ? 'bg-white/90 border-slate-200 text-slate-900' : 'bg-[#090a10]/90 border-white/10 text-white'
+          }`}>
+            {isLoggingOut ? (
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-orange-400 flex items-center justify-center animate-pulse shadow-apple-glow">
+                  <LogOut className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Logging Out...</h3>
+                  <p className={`text-xs mt-1 ${appSettings.theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>Please wait a moment</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center space-y-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center">
+                  <LogOut className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Sign Out</h3>
+                  <p className={`text-xs mt-1 ${appSettings.theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
+                    Are you sure you want to log out of your Spatial Research Hub?
+                  </p>
+                </div>
+                <div className="flex space-x-3 w-full">
+                  <button
+                    onClick={() => setShowLogoutConfirm(false)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition ${
+                      appSettings.theme === 'light' ? 'border-slate-300 text-slate-700 hover:bg-slate-100' : 'border-white/15 text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleLogoutFlow}
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-red-500 text-white text-xs font-semibold shadow-apple-glow hover:brightness-110 active:scale-95 transition"
+                  >
+                    Yes, Log Out
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

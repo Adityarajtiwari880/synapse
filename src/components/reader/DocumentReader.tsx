@@ -28,7 +28,8 @@ import {
   Check,
   X,
   MessageSquare,
-  Palette
+  Palette,
+  BookOpen
 } from 'lucide-react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { InkLayer } from '../ink/InkLayer';
@@ -947,7 +948,52 @@ export const DocumentReader: React.FC = () => {
           : 'bg-[#0c0e17] border-r border-white/10 text-slate-100'
       }`}
     >
-      {/* 1. CLEAN, ORGANIZED SINGLE-TIER TOOLBAR */}
+      {selectedDoc.id === 'null' ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-transparent to-black/5 dark:to-white/5">
+          <div className="w-20 h-20 mb-6 rounded-3xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-apple-glow relative">
+            <FileText className="w-10 h-10 text-blue-500" />
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-blue-600 border-4 border-[#0c0e17] flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition active:scale-95">
+              <label htmlFor="empty-upload" className="cursor-pointer">
+                <Upload className="w-4 h-4 text-white" />
+              </label>
+              <input 
+                id="empty-upload" 
+                type="file" 
+                accept="application/pdf,.docx,.txt" 
+                onChange={handleDocumentUpload} 
+                className="hidden" 
+              />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Welcome to Spatial Pro</h2>
+          <p className="max-w-md text-sm mb-8 text-slate-500 dark:text-slate-400">
+            Please add a document to start reading. Your files are processed 100% locally on your device for absolute privacy.
+          </p>
+          <div className="flex space-x-4">
+            <label className="cursor-pointer px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-apple-glow hover:brightness-110 active:scale-95 transition flex items-center space-x-2">
+              <Upload className="w-4 h-4" />
+              <span>Upload Document</span>
+              <input 
+                type="file" 
+                accept="application/pdf,.docx,.txt" 
+                onChange={handleDocumentUpload} 
+                className="hidden" 
+              />
+            </label>
+            <button 
+              onClick={() => document.getElementById('hub-trigger')?.click()} 
+              className={`px-6 py-3 rounded-2xl border font-semibold text-sm backdrop-blur-lg active:scale-95 transition flex items-center space-x-2 ${
+                appSettings.theme === 'light' ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50' : 'bg-white/5 hover:bg-white/10 border-white/15 text-white'
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Open Library</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* 1. CLEAN, ORGANIZED SINGLE-TIER TOOLBAR */}
       <div className={`h-12 px-2.5 sm:px-3.5 border-b flex items-center justify-between text-xs shrink-0 select-none z-20 gap-2 ${
         appSettings.theme === 'light'
           ? 'bg-white/85 backdrop-blur-md border-slate-200 text-slate-700 shadow-sm'
@@ -1647,7 +1693,9 @@ export const DocumentReader: React.FC = () => {
             <div
               contentEditable={readerInteractionMode === 'edit'}
               suppressContentEditableWarning={true}
-              className={`prose prose-sm dark:prose-invert max-w-none leading-relaxed outline-none select-text ${getFontSizeClass()}`}
+              className={`prose prose-sm max-w-none leading-relaxed outline-none select-text ${
+                appSettings.theme !== 'light' ? 'prose-invert' : ''
+              } ${getFontSizeClass()}`}
               dangerouslySetInnerHTML={{ __html: selectedDoc.docHtml }}
             />
           </div>
@@ -1901,6 +1949,8 @@ export const DocumentReader: React.FC = () => {
           ))}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

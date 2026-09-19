@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { ProfessionalField } from '../../types';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export const AuthPage: React.FC = () => {
   const { login, register, loginWithPasskey } = useAuth();
@@ -39,6 +40,8 @@ export const AuthPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
 
+  const [showLoginLoader, setShowLoginLoader] = useState(false);
+
   // Corporate Domain SSO auto-detection
   const isCorporateSSO =
     email.includes('@skadden.com') ||
@@ -46,6 +49,14 @@ export const AuthPage: React.FC = () => {
     email.includes('@blackrock.com') ||
     email.includes('@synapse.ai') ||
     email.includes('@oxford.edu');
+
+  const handleAuthSuccess = () => {
+    setShowLoginLoader(true);
+    setTimeout(() => {
+      setShowLoginLoader(false);
+      navigateTo('dashboard');
+    }, 2000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +68,7 @@ export const AuthPage: React.FC = () => {
         const ok = await login(email, password);
         if (ok) {
           switchField(selectedCategory);
-          navigateTo('dashboard');
+          handleAuthSuccess();
         } else {
           setError('Invalid credentials. Please verify your email and password.');
         }
@@ -70,8 +81,7 @@ export const AuthPage: React.FC = () => {
         const ok = await register(name, email, password);
         if (ok) {
           switchField(selectedCategory);
-          setSuccessMsg('Account registered successfully! Redirecting...');
-          setTimeout(() => navigateTo('dashboard'), 600);
+          handleAuthSuccess();
         } else {
           setError('An account with this corporate email already exists.');
         }
@@ -100,7 +110,24 @@ export const AuthPage: React.FC = () => {
     <div className={`min-h-screen flex flex-col font-sans selection:bg-blue-500/30 selection:text-white relative overflow-hidden transition-colors duration-200 ${
       isLight ? 'bg-[#f5f5f7] text-slate-900' : 'bg-[#07080f] text-slate-100'
     }`}>
-      {/* Ambient background glows */}
+      {/* Login Loader Overlay */}
+      {showLoginLoader && (
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className={`p-8 rounded-3xl border flex flex-col items-center justify-center space-y-4 max-w-sm w-full mx-4 shadow-2xl ${
+            isLight ? 'bg-white/80 border-slate-200 text-slate-900' : 'bg-black/60 border-white/10 text-white'
+          }`}>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-apple-glow animate-pulse">
+              <Layers className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-bold text-lg">Logging In...</h3>
+              <p className={`text-xs mt-1 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Setting up things for you</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Background Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[130px] pointer-events-none rounded-full"></div>
       <div className="absolute bottom-0 right-10 w-[500px] h-[300px] bg-indigo-500/10 blur-[120px] pointer-events-none rounded-full"></div>
 
@@ -215,23 +242,31 @@ export const AuthPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => alert("Enterprise SSO requires configuration in Supabase Dashboard. Please use Email/Password.")}
+                  onClick={async () => {
+                    if (!isSupabaseConfigured) return alert("Enterprise SSO requires configuration in Supabase Dashboard.");
+                    const { error } = await supabase.auth.signInWithOAuth({ provider: 'azure' });
+                    if (error) alert(error.message);
+                  }}
                   className={`p-2.5 rounded-xl border text-xs font-medium transition flex items-center justify-center space-x-2 ${
                     isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
                   }`}
                 >
                   <Building className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Okta SSO</span>
+                  <span>Okta / Azure</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert("Enterprise SSO requires configuration in Supabase Dashboard. Please use Email/Password.")}
+                  onClick={async () => {
+                    if (!isSupabaseConfigured) return alert("Enterprise SSO requires configuration in Supabase Dashboard.");
+                    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+                    if (error) alert(error.message);
+                  }}
                   className={`p-2.5 rounded-xl border text-xs font-medium transition flex items-center justify-center space-x-2 ${
                     isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5 text-cyan-500" />
-                  <span>Microsoft Entra</span>
+                  <span>Google SSO</span>
                 </button>
               </div>
 
