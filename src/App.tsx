@@ -149,7 +149,7 @@ const MainWorkspaceContent: React.FC = () => {
 
   if (activeView === 'trust') {
     return (
-      <div className={`min-h-screen w-screen overflow-x-hidden ${getThemeBackground()} ${getFontFamilyClass()}`}>
+      <div className={`min-h-[100dvh] w-screen overflow-x-hidden ${getThemeBackground()} ${getFontFamilyClass()}`}>
         <TrustCenter />
         <CommandPalette isOpen={isCmdOpen} onClose={() => setIsCmdOpen(false)} onToggleDebugger={() => setIsDebuggerOpen(prev => !prev)} />
       </div>
@@ -158,7 +158,7 @@ const MainWorkspaceContent: React.FC = () => {
 
   if (activeView === 'docs') {
     return (
-      <div className={`min-h-screen w-screen overflow-x-hidden ${getThemeBackground()} ${getFontFamilyClass()}`}>
+      <div className={`min-h-[100dvh] w-screen overflow-x-hidden ${getThemeBackground()} ${getFontFamilyClass()}`}>
         <DocsPage />
         <CommandPalette isOpen={isCmdOpen} onClose={() => setIsCmdOpen(false)} onToggleDebugger={() => setIsDebuggerOpen(prev => !prev)} />
       </div>
@@ -167,7 +167,7 @@ const MainWorkspaceContent: React.FC = () => {
 
   if (activeView === 'pricing') {
     return (
-      <div className={`min-h-screen w-screen overflow-x-hidden ${getThemeBackground()} ${getFontFamilyClass()}`}>
+      <div className={`min-h-[100dvh] w-screen overflow-x-hidden ${getThemeBackground()} ${getFontFamilyClass()}`}>
         <PricingPage />
         <CommandPalette isOpen={isCmdOpen} onClose={() => setIsCmdOpen(false)} onToggleDebugger={() => setIsDebuggerOpen(prev => !prev)} />
       </div>
@@ -176,7 +176,7 @@ const MainWorkspaceContent: React.FC = () => {
 
   // 3. Application Workbench Shell (Workspace, Library, Matrix, Admin)
   return (
-    <div className={`h-screen w-screen flex flex-col overflow-hidden select-none antialiased ${getThemeBackground()} ${getFontFamilyClass()}`}>
+    <div className={`h-[100dvh] w-screen flex flex-col overflow-hidden select-none antialiased ${getThemeBackground()} ${getFontFamilyClass()}`}>
       {/* Top Glass Navigation Bar */}
       <Header
         onOpenAuth={() => setIsAuthOpen(true)}
