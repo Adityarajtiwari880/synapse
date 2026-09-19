@@ -17,6 +17,10 @@ import {
 } from '../types';
 import { useAuth } from './AuthContext';
 import { parseDocumentFile } from '../services/pdfService';
+import { useMatters } from '../hooks/useMatters';
+import { useCanvas } from '../hooks/useCanvas';
+import { useDocuments } from '../hooks/useDocuments';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 export type { ProfessionalField, SqueezeMode, AppView, EnterpriseMatter };
 
@@ -442,9 +446,6 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [squeezeMode, setSqueezeMode] = useState<SqueezeMode>('none');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [nodes, setNodes] = useState<CanvasNode[]>(INITIAL_NODES);
-  const [edges, setEdges] = useState<CanvasEdge[]>(INITIAL_EDGES);
-  const [frames, setFrames] = useState<CanvasFrame[]>(INITIAL_FRAMES);
   const [ghosts, setGhosts] = useState<GhostNode[]>(INITIAL_GHOSTS);
   const [ghostLayerActive, setGhostLayerActive] = useState(true);
   const [inkStrokes, setInkStrokes] = useState<InkStroke[]>([]);
@@ -457,14 +458,48 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const [synthesisRows, setSynthesisRows] = useState<SynthesisRow[]>(INITIAL_SYNTHESIS);
   const [activeView, setActiveView] = useState<AppView>('landing');
-  const [matters, setMatters] = useState<EnterpriseMatter[]>(() => {
-    const saved = localStorage.getItem('synapse_matters');
-    return saved ? JSON.parse(saved) : INITIAL_MATTERS;
-  });
+
+  // ─── SUPABASE INTEGRATION HOOKS ───
+  const { matters, createMatter: supCreateMatter, updateMatter, deleteMatter } = useMatters(
+    currentUser?.id ?? null,
+    (() => {
+      const saved = localStorage.getItem('synapse_matters');
+      return saved ? JSON.parse(saved) : INITIAL_MATTERS;
+    })()
+  );
+
   const [activeMatter, setActiveMatter] = useState<EnterpriseMatter | null>(matters[0] || null);
 
+  const {
+    nodes, edges, frames,
+    addNode: supAddNode, updateNode: supUpdateNode, updateNodePos: supUpdateNodePos, updateNodesPos: supUpdateNodesPos, deleteNode: supDeleteNode,
+    addEdge: supAddEdge, updateEdge: supUpdateEdge, deleteEdge: supDeleteEdge,
+    addFrame: supAddFrame, deleteFrame: supDeleteFrame
+  } = useCanvas(activeMatter?.id ?? null, INITIAL_NODES, INITIAL_EDGES, INITIAL_FRAMES);
+
+  const { uploadDocument, fetchDocuments, deleteDocument: supDeleteDocument } = useDocuments(activeMatter?.id ?? null, currentUser?.id ?? null);
+
+  // Sync documents from Supabase or fallback
   useEffect(() => {
-    localStorage.setItem('synapse_matters', JSON.stringify(matters));
+    if (activeMatter) {
+      fetchDocuments().then((docs) => {
+        if (docs && docs.length > 0) {
+          setDocuments(docs);
+          setSelectedDoc(docs[0]);
+        } else {
+          // Fallback to industry docs
+          const docs = INDUSTRY_DOCS[activeMatter.field] || INDUSTRY_DOCS['academic'];
+          setDocuments(docs);
+          setSelectedDoc(docs[0]);
+        }
+      });
+    }
+  }, [activeMatter, fetchDocuments]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      localStorage.setItem('synapse_matters', JSON.stringify(matters));
+    }
   }, [matters]);
 
   const navigateTo = (view: AppView) => {
@@ -481,25 +516,13 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const createMatter = (matterData: Partial<EnterpriseMatter>) => {
-    const newMatter: EnterpriseMatter = {
-      id: `mat-${Date.now()}`,
-      title: matterData.title || 'Untitled Matter',
-      matterNumber: matterData.matterNumber || `MAT-2026-${Math.floor(100 + Math.random() * 900)}`,
-      client: matterData.client || 'Internal Client',
-      field: matterData.field || 'legal',
-      status: matterData.status || 'active',
-      lastModified: 'Just now',
-      documentCount: matterData.documentCount || 1,
-      nodeCount: matterData.nodeCount || 0,
-      collaboratorCount: 1,
-      description: matterData.description || 'Enterprise spatial research dossier.',
-      tags: matterData.tags || ['Enterprise']
-    };
-    setMatters(prev => [newMatter, ...prev]);
-    setActiveMatter(newMatter);
-    switchField(newMatter.field);
-    navigateTo('workspace');
+  const createMatter = async (matterData: Partial<EnterpriseMatter>) => {
+    const newMatter = await supCreateMatter(matterData as any);
+    if (newMatter) {
+      setActiveMatter(newMatter);
+      switchField(newMatter.field);
+      navigateTo('workspace');
+    }
   };
 
   const [splitLayout, setSplitLayout] = useState<'50/50' | '70/30' | '30/70' | 'canvas-only' | 'reader-only'>('50/50');
@@ -565,44 +588,33 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const importDocument = async (file: File) => {
-    addAuditLog('document_import', `Parsing uploaded file: ${file.name}...`);
+    addAuditLog('document_import', `Parsing and uploading: ${file.name}...`);
     try {
-      const parsed = await parseDocumentFile(file);
-      const newDoc: DocumentItem = {
-        id: `doc-${Date.now()}`,
-        title: parsed.title,
-        authors: currentUser?.name || 'Local User',
-        year: new Date().getFullYear(),
-        pages: parsed.totalPages || 1,
-        highlightsCount: 0,
-        fileSize: parsed.fileSize,
-        fileType: parsed.fileType,
-        docHtml: parsed.docHtml,
-        docContent: parsed.docContent,
-        ingestStatus: 'ready',
-        abstract: parsed.fullText ? parsed.fullText.slice(0, 300) + '...' : `Uploaded ${parsed.fileType.toUpperCase()} document.`,
-        parsedPdf: parsed
-      };
-      setDocuments(prev => [newDoc, ...prev]);
-      setSelectedDoc(newDoc);
-      addAuditLog('document_import', `Successfully parsed ${parsed.totalPages} pages from ${file.name} (${parsed.fileType.toUpperCase()})`);
+      const parsed = await uploadDocument(file);
+      if (parsed) {
+        const newDoc: DocumentItem = {
+          id: `doc-${Date.now()}`,
+          title: parsed.title,
+          authors: currentUser?.name || 'Local User',
+          year: new Date().getFullYear(),
+          pages: parsed.totalPages || 1,
+          highlightsCount: 0,
+          fileSize: parsed.fileSize,
+          fileType: parsed.fileType,
+          docHtml: parsed.docHtml,
+          docContent: parsed.docContent,
+          ingestStatus: 'ready',
+          abstract: parsed.fullText ? parsed.fullText.slice(0, 300) + '...' : `Uploaded ${parsed.fileType.toUpperCase()} document.`,
+          parsedPdf: parsed,
+          storageUrl: parsed.storageUrl,
+        };
+        setDocuments(prev => [newDoc, ...prev]);
+        setSelectedDoc(newDoc);
+        addAuditLog('document_import', `Successfully ingested ${file.name}`);
+      }
     } catch (err) {
-      console.warn('Document parsing fallback', err);
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'generic';
-      const fallbackDoc: DocumentItem = {
-        id: `doc-${Date.now()}`,
-        title: file.name.replace(/\.[^/.]+$/, ''),
-        authors: currentUser?.name || 'Local User',
-        year: new Date().getFullYear(),
-        pages: 5,
-        highlightsCount: 0,
-        fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        fileType: ext as any,
-        ingestStatus: 'ready',
-        abstract: `Uploaded ${ext.toUpperCase()} document ready for active reading.`
-      };
-      setDocuments(prev => [fallbackDoc, ...prev]);
-      setSelectedDoc(fallbackDoc);
+      console.error('Document import failed', err);
+      addAuditLog('document_import', `Failed to import ${file.name}`, 'error');
     }
   };
 
@@ -612,60 +624,51 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const addNode = (nodeData: Omit<CanvasNode, 'id' | 'createdAt'> & { id?: string }) => {
-    const id = nodeData.id || `node-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
-    const newNode: CanvasNode = {
-      ...nodeData,
-      id,
-      createdAt: Date.now()
-    };
-    setNodes(prev => [...prev, newNode]);
+    const id = nodeData.id || `node-${Date.now()}`;
+    const newNode = { ...nodeData, id };
+    supAddNode(newNode);
     addAuditLog('node_create', `Created Smart Node: "${nodeData.title}"`);
     return id;
   };
 
   const updateNode = (id: string, partial: Partial<CanvasNode>) => {
-    setNodes(prev => prev.map(n => n.id === id ? { ...n, ...partial } : n));
+    supUpdateNode(id, partial);
     if (partial.title) {
       addAuditLog('node_create', `Updated node: "${partial.title}"`);
     }
   };
 
   const updateNodePos = (id: string, x: number, y: number) => {
-    setNodes(prev => prev.map(n => n.id === id ? { ...n, x, y } : n));
+    supUpdateNodePos(id, x, y);
   };
 
   const updateNodesPos = (updates: { id: string; x: number; y: number }[]) => {
-    const updateMap = new Map(updates.map(u => [u.id, u]));
-    setNodes(prev => prev.map(n => {
-      const match = updateMap.get(n.id);
-      return match ? { ...n, x: match.x, y: match.y } : n;
-    }));
+    supUpdateNodesPos(updates);
   };
 
   const deleteNode = (id: string) => {
-    setNodes(prev => prev.filter(n => n.id !== id));
-    setEdges(prev => prev.filter(e => e.source !== id && e.target !== id));
+    supDeleteNode(id);
   };
 
   const addFrame = (frame: CanvasFrame) => {
-    setFrames(prev => [...prev, frame]);
+    supAddFrame(frame);
     addAuditLog('frame_create', `Created Group Frame: "${frame.title}"`);
   };
 
   const deleteFrame = (frameId: string) => {
-    setFrames(prev => prev.filter(f => f.id !== frameId));
+    supDeleteFrame(frameId);
   };
 
   const addEdge = (edge: CanvasEdge) => {
-    setEdges(prev => [...prev, edge]);
+    supAddEdge(edge);
   };
 
   const updateEdge = (id: string, partial: Partial<CanvasEdge>) => {
-    setEdges(prev => prev.map(e => e.id === id ? { ...e, ...partial } : e));
+    supUpdateEdge(id, partial);
   };
 
   const deleteEdge = (edgeId: string) => {
-    setEdges(prev => prev.filter(e => e.id !== edgeId));
+    supDeleteEdge(edgeId);
   };
 
   const acceptGhost = (ghostId: string) => {
@@ -687,18 +690,15 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       anchors: [ghost.targetAnchor]
     };
 
-    setNodes(prev => [...prev, newNode]);
+    supAddNode(newNode);
 
     if (nodes.length > 0) {
-      setEdges(prev => [
-        ...prev,
-        {
-          id: `edge-${Date.now()}`,
-          source: nodes[0].id,
-          target: newNodeId,
-          relation: ghost.relation
-        }
-      ]);
+      supAddEdge({
+        id: `edge-${Date.now()}`,
+        source: nodes[0].id,
+        target: newNodeId,
+        relation: ghost.relation
+      });
     }
 
     setGhosts(prev => prev.filter(g => g.id !== ghostId));

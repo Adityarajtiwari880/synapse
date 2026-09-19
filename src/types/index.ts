@@ -166,6 +166,7 @@ export interface DocumentItem {
   docContent?: string; // Raw editable text content
   ingestStatus: 'ready' | 'processing' | 'failed';
   abstract?: string;
+  storageUrl?: string;
   parsedPdf?: {
     title: string;
     totalPages: number;

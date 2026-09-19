@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { User, Role, ActiveSession } from '../types';
 
 interface AuthContextType {
@@ -16,9 +17,11 @@ interface AuthContextType {
   canEditCanvas: boolean;
   canRunAgents: boolean;
   canAccessAdmin: boolean;
+  supabaseUserId: string | null;
 }
 
-const INITIAL_USERS: User[] = [
+// ─── Fallback mock users (used when Supabase not configured) ──
+const MOCK_USERS: User[] = [
   {
     id: 'usr-admin',
     name: 'Aditya Raj Tiwari',
@@ -26,7 +29,7 @@ const INITIAL_USERS: User[] = [
     role: 'admin',
     status: 'active',
     createdAt: '2026-09-01',
-    lastActive: 'Just now'
+    lastActive: 'Just now',
   },
   {
     id: 'usr-res1',
@@ -35,176 +38,253 @@ const INITIAL_USERS: User[] = [
     role: 'researcher',
     status: 'active',
     createdAt: '2026-09-05',
-    lastActive: '15m ago'
+    lastActive: '15m ago',
   },
-  {
-    id: 'usr-rev1',
-    name: 'Marcus Vance',
-    email: 'marcus@mit.edu',
-    role: 'reviewer',
-    status: 'active',
-    createdAt: '2026-09-10',
-    lastActive: '2h ago'
-  },
-  {
-    id: 'usr-view1',
-    name: 'Sophie Lin',
-    email: 'sophie@stanford.edu',
-    role: 'viewer',
-    status: 'active',
-    createdAt: '2026-09-12',
-    lastActive: '1d ago'
-  }
 ];
 
-const INITIAL_SESSIONS: ActiveSession[] = [
+const MOCK_SESSIONS: ActiveSession[] = [
   {
     id: 'sess-1',
     userId: 'usr-admin',
     userName: 'Aditya Raj Tiwari',
     device: 'MacBook Pro 16" (M3 Max)',
-    browser: 'Safari 18.1 · macOS Sequoia',
+    browser: 'Chrome · Windows 11',
     ip: '192.168.1.104',
     lastActive: 'Active Now',
-    isCurrent: true
+    isCurrent: true,
   },
-  {
-    id: 'sess-2',
-    userId: 'usr-admin',
-    userName: 'Aditya Raj Tiwari',
-    device: 'iPad Pro 13" (M4 OLED)',
-    browser: 'Mobile Safari · iPadOS 18',
-    ip: '192.168.1.112',
-    lastActive: '24m ago',
-    isCurrent: false
-  },
-  {
-    id: 'sess-3',
-    userId: 'usr-res1',
-    userName: 'Dr. Elena Rostova',
-    device: 'Dell XPS 15 (Windows 11)',
-    browser: 'Chrome 128.0',
-    ip: '142.250.180.45',
-    lastActive: '15m ago',
-    isCurrent: false
-  }
 ];
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('synapse_users');
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+    return saved ? JSON.parse(saved) : MOCK_USERS;
   });
-
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(() => {
     const saved = localStorage.getItem('synapse_sessions');
-    return saved ? JSON.parse(saved) : INITIAL_SESSIONS;
+    return saved ? JSON.parse(saved) : MOCK_SESSIONS;
   });
+  const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const savedId = localStorage.getItem('synapse_current_user_id');
-    if (savedId) {
-      const match = users.find(u => u.id === savedId);
-      if (match) return match;
-    }
-    return users[0]; // Default to Aditya (admin) for full capability access
-  });
-
+  // ─── On mount: restore session from Supabase OR localStorage ──
   useEffect(() => {
-    localStorage.setItem('synapse_users', JSON.stringify(users));
+    if (!isSupabaseConfigured) {
+      // Local-only mode: restore from localStorage
+      const savedId = localStorage.getItem('synapse_current_user_id');
+      if (savedId) {
+        const match = users.find((u) => u.id === savedId);
+        if (match) setCurrentUser(match);
+      } else {
+        setCurrentUser(users[0]); // default to admin for demo
+      }
+      setLoading(false);
+      return;
+    }
+
+    // Supabase mode: restore session and listen for auth changes
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setSupabaseUserId(session.user.id);
+        loadProfile(session.user.id, session.user.email ?? '');
+      } else {
+        setLoading(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setSupabaseUserId(session.user.id);
+        loadProfile(session.user.id, session.user.email ?? '');
+      } else {
+        setCurrentUser(null);
+        setSupabaseUserId(null);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadProfile = async (uid: string, email: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', uid)
+      .single();
+
+    if (data) {
+      const user: User = {
+        id: uid,
+        name: data.name,
+        email: data.email,
+        role: data.role as Role,
+        status: 'active',
+        createdAt: data.created_at,
+        lastActive: 'Just now',
+      };
+      setCurrentUser(user);
+    } else {
+      // Profile not yet created (trigger may still be running)
+      setCurrentUser({
+        id: uid,
+        name: email.split('@')[0],
+        email,
+        role: 'researcher',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        lastActive: 'Just now',
+      });
+    }
+    setLoading(false);
+  };
+
+  // ─── Persist local users ──────────────────────────────────
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      localStorage.setItem('synapse_users', JSON.stringify(users));
+    }
   }, [users]);
 
   useEffect(() => {
-    localStorage.setItem('synapse_sessions', JSON.stringify(activeSessions));
-  }, [activeSessions]);
-
-  useEffect(() => {
-    if (currentUser) {
+    if (!isSupabaseConfigured && currentUser) {
       localStorage.setItem('synapse_current_user_id', currentUser.id);
-    } else {
-      localStorage.removeItem('synapse_current_user_id');
     }
   }, [currentUser]);
 
-  const login = async (email: string, _pass: string): Promise<boolean> => {
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (user) {
-      if (user.status === 'suspended') {
-        alert('Account suspended. Contact workspace administrator.');
-        return false;
+  // ─── LOGIN ────────────────────────────────────────────────
+  const login = async (email: string, pass: string): Promise<boolean> => {
+    if (!isSupabaseConfigured) {
+      // Local mock login
+      const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+      if (user) {
+        if (user.status === 'suspended') {
+          alert('Account suspended. Contact workspace administrator.');
+          return false;
+        }
+        setCurrentUser(user);
+        return true;
       }
-      setCurrentUser(user);
+      // Auto-create new user
+      const newUser: User = {
+        id: `usr-${Date.now()}`,
+        name: email.split('@')[0],
+        email,
+        role: 'researcher',
+        status: 'active',
+        createdAt: new Date().toISOString().split('T')[0],
+        lastActive: 'Just now',
+      };
+      setUsers((prev) => [newUser, ...prev]);
+      setCurrentUser(newUser);
       return true;
     }
-    // Auto-create researcher if not found
-    const newUser: User = {
-      id: `usr-${Date.now()}`,
-      name: email.split('@')[0],
-      email,
-      role: 'researcher',
-      status: 'active',
-      createdAt: new Date().toISOString().split('T')[0],
-      lastActive: 'Just now'
-    };
-    setUsers(prev => [newUser, ...prev]);
-    setCurrentUser(newUser);
+
+    // Supabase login
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      alert(error.message);
+      return false;
+    }
     return true;
   };
 
-  const register = async (name: string, email: string, _pass: string): Promise<boolean> => {
-    const newUser: User = {
-      id: `usr-${Date.now()}`,
-      name,
+  // ─── REGISTER ─────────────────────────────────────────────
+  const register = async (name: string, email: string, pass: string): Promise<boolean> => {
+    if (!isSupabaseConfigured) {
+      const newUser: User = {
+        id: `usr-${Date.now()}`,
+        name,
+        email,
+        role: 'researcher',
+        status: 'active',
+        createdAt: new Date().toISOString().split('T')[0],
+        lastActive: 'Just now',
+      };
+      setUsers((prev) => [newUser, ...prev]);
+      setCurrentUser(newUser);
+      return true;
+    }
+
+    const { error } = await supabase.auth.signUp({
       email,
-      role: 'researcher',
-      status: 'active',
-      createdAt: new Date().toISOString().split('T')[0],
-      lastActive: 'Just now'
-    };
-    setUsers(prev => [newUser, ...prev]);
-    setCurrentUser(newUser);
+      password: pass,
+      options: { data: { name } },
+    });
+    if (error) {
+      alert(error.message);
+      return false;
+    }
     return true;
   };
 
+  // ─── PASSKEY (Apple Touch ID simulation) ─────────────────
   const loginWithPasskey = async (): Promise<boolean> => {
-    // Apple Touch ID / Face ID WebAuthn API Simulation with haptic delay
-    await new Promise(res => setTimeout(res, 400));
-    const adminUser = users.find(u => u.role === 'admin') || users[0];
+    await new Promise((res) => setTimeout(res, 400));
+    if (!isSupabaseConfigured) {
+      const adminUser = users.find((u) => u.role === 'admin') || users[0];
+      setCurrentUser(adminUser);
+      return true;
+    }
+    // Future: WebAuthn via supabase.auth.signInWithOtp / passkey API
+    const adminUser = users.find((u) => u.role === 'admin') || users[0];
     setCurrentUser(adminUser);
     return true;
   };
 
-  const logout = () => {
+  // ─── LOGOUT ───────────────────────────────────────────────
+  const logout = async () => {
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut();
+    }
     setCurrentUser(null);
+    setSupabaseUserId(null);
+    localStorage.removeItem('synapse_current_user_id');
   };
 
+  // ─── Admin: role & status management ─────────────────────
   const switchUserRole = (userId: string, newRole: Role) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
-    if (currentUser && currentUser.id === userId) {
-      setCurrentUser(prev => prev ? { ...prev, role: newRole } : null);
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
+    if (currentUser?.id === userId) {
+      setCurrentUser((prev) => (prev ? { ...prev, role: newRole } : null));
     }
   };
 
   const toggleUserStatus = (userId: string) => {
-    setUsers(prev => prev.map(u => {
-      if (u.id === userId) {
-        const newStatus = u.status === 'active' ? 'suspended' : 'active';
-        return { ...u, status: newStatus };
-      }
-      return u;
-    }));
+    setUsers((prev) =>
+      prev.map((u) => {
+        if (u.id === userId) {
+          const newStatus = u.status === 'active' ? 'suspended' : 'active';
+          return { ...u, status: newStatus };
+        }
+        return u;
+      })
+    );
   };
 
   const killSession = (sessionId: string) => {
-    setActiveSessions(prev => prev.filter(s => s.id !== sessionId));
+    setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
   };
 
-  // RBAC Privileges
+  // ─── RBAC privileges ──────────────────────────────────────
   const canEditCanvas = currentUser?.role === 'admin' || currentUser?.role === 'researcher';
   const canRunAgents = currentUser?.role === 'admin' || currentUser?.role === 'researcher';
   const canAccessAdmin = currentUser?.role === 'admin';
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#090a10] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 animate-pulse" />
+          <p className="text-xs text-slate-400">Loading Synapse…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider
@@ -222,7 +302,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         killSession,
         canEditCanvas,
         canRunAgents,
-        canAccessAdmin
+        canAccessAdmin,
+        supabaseUserId,
       }}
     >
       {children}
