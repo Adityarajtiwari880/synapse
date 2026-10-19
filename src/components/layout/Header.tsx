@@ -22,7 +22,8 @@ import {
   ShieldCheck,
   Sun,
   Moon,
-  Download
+  Download,
+  ChevronDown
 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
@@ -73,6 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const { isInstalled } = usePWAInstall();
   const [isInstallOpen, setIsInstallOpen] = useState(false);
+  const [isFieldMenuOpen, setIsFieldMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -173,51 +175,69 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
         </div>
 
-        {/* Center: Professional Field Preset Selector (Only on wide desktop to prevent iPad landscape clipping) */}
-        <div className="hidden xl:flex items-center space-x-1.5 p-1 rounded-xl bg-black/40 border border-white/10 text-xs shrink-0">
+        {/* Center: Sleek Apple-Style Mode Pill with Dropdown */}
+        <div className="relative hidden md:block">
           <button
-            onClick={() => switchField('legal')}
-            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-              activeField === 'legal' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-            }`}
-            title="Legal & Contracts Mode"
+            onClick={() => setIsFieldMenuOpen(!isFieldMenuOpen)}
+            className="ios-glass-btn px-3 py-1.5 flex items-center space-x-1.5 text-xs font-semibold hover:border-white/30 transition active:scale-95"
+            title="Switch Workspace Preset Mode"
           >
-            <Scale className="w-3 h-3 text-amber-400" />
-            <span>Legal</span>
+            {activeField === 'academic' && <GraduationCap className="w-3.5 h-3.5 text-blue-400" />}
+            {activeField === 'legal' && <Scale className="w-3.5 h-3.5 text-amber-400" />}
+            {activeField === 'business' && <Briefcase className="w-3.5 h-3.5 text-emerald-400" />}
+            {activeField === 'medical' && <Stethoscope className="w-3.5 h-3.5 text-rose-400" />}
+            <span className="text-slate-200 capitalize">
+              {activeField === 'academic' ? 'Research Mode' : activeField === 'legal' ? 'Legal Mode' : activeField === 'business' ? 'Business Mode' : 'Medical Mode'}
+            </span>
+            <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
           </button>
 
-          <button
-            onClick={() => switchField('academic')}
-            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-              activeField === 'academic' ? 'bg-blue-600/20 text-blue-300 border border-blue-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-            }`}
-            title="Study & Research Mode"
-          >
-            <GraduationCap className="w-3 h-3 text-blue-400" />
-            <span>Research</span>
-          </button>
-
-          <button
-            onClick={() => switchField('business')}
-            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-              activeField === 'business' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-            }`}
-            title="Business & Finance Mode"
-          >
-            <Briefcase className="w-3 h-3 text-emerald-400" />
-            <span>Business</span>
-          </button>
-
-          <button
-            onClick={() => switchField('medical')}
-            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-              activeField === 'medical' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-            }`}
-            title="Medical & Health Mode"
-          >
-            <Stethoscope className="w-3 h-3 text-rose-400" />
-            <span>Medical</span>
-          </button>
+          {isFieldMenuOpen && (
+            <div
+              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 ios-glass p-1.5 rounded-2xl shadow-2xl border border-white/20 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-0.5"
+              onMouseDown={e => e.stopPropagation()}
+            >
+              <div className="px-2.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/10">
+                Workspace Preset
+              </div>
+              <button
+                onClick={() => { switchField('academic'); setIsFieldMenuOpen(false); }}
+                className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs transition flex items-center space-x-2 ${
+                  activeField === 'academic' ? 'bg-blue-600/25 text-white font-semibold' : 'text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
+                <span>Research &amp; Study</span>
+              </button>
+              <button
+                onClick={() => { switchField('legal'); setIsFieldMenuOpen(false); }}
+                className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs transition flex items-center space-x-2 ${
+                  activeField === 'legal' ? 'bg-amber-500/25 text-white font-semibold' : 'text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                <Scale className="w-3.5 h-3.5 text-amber-400" />
+                <span>Legal &amp; Contracts</span>
+              </button>
+              <button
+                onClick={() => { switchField('business'); setIsFieldMenuOpen(false); }}
+                className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs transition flex items-center space-x-2 ${
+                  activeField === 'business' ? 'bg-emerald-500/25 text-white font-semibold' : 'text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Business &amp; Finance</span>
+              </button>
+              <button
+                onClick={() => { switchField('medical'); setIsFieldMenuOpen(false); }}
+                className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs transition flex items-center space-x-2 ${
+                  activeField === 'medical' ? 'bg-rose-500/25 text-white font-semibold' : 'text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                <Stethoscope className="w-3.5 h-3.5 text-rose-400" />
+                <span>Medical &amp; Clinical</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Header: Actions, PWA Download, Theme & User */}

@@ -1085,43 +1085,58 @@ export const SpatialCanvas: React.FC = () => {
           ))}
       </div>
 
-      {/* FLOATING APPLE WORKSPACE DOCK */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 glass-panel px-4 py-2 rounded-2xl flex items-center space-x-2 shadow-2xl z-40 select-none">
-        {/* Navigation Pan / Zoom */}
+      {/* EMPTY CANVAS WATERMARK GUIDE */}
+      {nodes.length === 0 && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center space-y-3 max-w-sm select-none z-10 animate-in fade-in duration-300">
+          <div className="w-14 h-14 rounded-2xl ios-glass mx-auto flex items-center justify-center shadow-apple-glow text-blue-400">
+            <Layers className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="font-bold text-base text-slate-200">Spatial Research Canvas</h3>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              Select any text in the reader to extract quotes, or tap <span className="text-blue-400 font-semibold">+ New Card</span> to organize your ideas visually.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* FLOATING APPLE LIQUID GLASS WORKSPACE DOCK */}
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 ios-glass px-3.5 py-1.5 rounded-full flex items-center space-x-1.5 shadow-2xl z-40 select-none border border-white/20">
+        {/* Navigation Pan Tool */}
         <button
           onClick={() => setCanvasTool('pan')}
-          className={`p-2 rounded-xl transition ${canvasTool === 'pan' ? 'bg-white/20 text-white' : 'text-slate-400 hover:text-white'}`}
+          className={`p-2 rounded-full transition ${canvasTool === 'pan' ? 'bg-white/20 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
           title="Pan & Select Tool"
         >
-          <Maximize className="w-4 h-4" />
+          <Maximize className="w-3.5 h-3.5" />
         </button>
 
         {/* Freehand Canvas Inking */}
         <button
           onClick={() => setCanvasTool(canvasTool === 'pen' ? 'pan' : 'pen')}
-          className={`p-2 rounded-xl transition ${canvasTool === 'pen' ? 'bg-indigo-600 text-white shadow-ghost-glow' : 'text-slate-400 hover:text-white'}`}
+          className={`p-2 rounded-full transition ${canvasTool === 'pen' ? 'bg-indigo-600 text-white shadow-ghost-glow' : 'text-slate-400 hover:text-white'}`}
           title="Ink on Canvas"
         >
-          <PenTool className="w-4 h-4" />
+          <PenTool className="w-3.5 h-3.5" />
         </button>
 
         {canvasTool !== 'pan' && (
           <button
             onClick={() => undoInkStroke('canvas')}
-            className="p-2 text-slate-400 hover:text-white rounded-xl"
+            className="p-2 text-slate-400 hover:text-white rounded-full"
             title="Undo Canvas Ink"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         )}
 
-        <div className="h-4 w-px bg-white/15 mx-1"></div>
+        <div className="h-4 w-px bg-white/15 mx-0.5"></div>
 
         {/* Canvas Page Design Selector */}
         <div className="relative">
           <button
             onClick={() => setIsDesignMenuOpen(!isDesignMenuOpen)}
-            className={`px-2.5 py-1.5 rounded-xl transition flex items-center space-x-1 text-xs font-medium ${
+            className={`px-2.5 py-1.5 rounded-full transition flex items-center space-x-1 text-xs font-medium ${
               isDesignMenuOpen
                 ? 'bg-blue-600 text-white shadow-apple-glow'
                 : 'hover:bg-white/10 text-slate-200'
@@ -1130,7 +1145,7 @@ export const SpatialCanvas: React.FC = () => {
           >
             <LayoutGrid className="w-3.5 h-3.5 text-cyan-400" />
             <span className="hidden sm:inline capitalize">
-              {CANVAS_DESIGNS.find(d => d.id === appSettings.canvasDesign)?.label || 'Page Design'}
+              {CANVAS_DESIGNS.find(d => d.id === appSettings.canvasDesign)?.label || 'Grid'}
             </span>
           </button>
 
@@ -1138,7 +1153,7 @@ export const SpatialCanvas: React.FC = () => {
           {isDesignMenuOpen && (
             <div
               onPointerDown={e => e.stopPropagation()}
-              className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 glass-panel border border-white/20 p-2 rounded-2xl shadow-2xl z-50 animate-in zoom-in-95 duration-100 space-y-1"
+              className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 ios-glass border border-white/20 p-2 rounded-2xl shadow-2xl z-50 animate-in zoom-in-95 duration-100 space-y-1"
             >
               <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/10">
                 Canvas Page Design
@@ -1171,7 +1186,7 @@ export const SpatialCanvas: React.FC = () => {
 
         <button
           onClick={createQuickNote}
-          className="px-2.5 py-1.5 rounded-xl hover:bg-white/10 text-slate-200 text-xs font-medium flex items-center space-x-1 transition"
+          className="px-3 py-1.5 rounded-full hover:bg-white/10 text-slate-200 text-xs font-medium flex items-center space-x-1.5 transition active:scale-95"
         >
           <Plus className="w-3.5 h-3.5 text-blue-400" />
           <span>New Card</span>
@@ -1179,30 +1194,21 @@ export const SpatialCanvas: React.FC = () => {
 
         <button
           onClick={createGroupFrame}
-          className="px-2.5 py-1.5 rounded-xl hover:bg-white/10 text-slate-200 text-xs font-medium flex items-center space-x-1 transition"
+          className="px-3 py-1.5 rounded-full hover:bg-white/10 text-slate-200 text-xs font-medium flex items-center space-x-1.5 transition active:scale-95"
         >
           <FolderPlus className="w-3.5 h-3.5 text-indigo-400" />
           <span>New Frame</span>
         </button>
 
-        <div className="h-4 w-px bg-white/15 mx-1"></div>
+        <div className="h-4 w-px bg-white/15 mx-0.5"></div>
 
         <button
           onClick={runAgentSynthesis}
-          className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-apple-glow transition"
+          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-apple-glow transition active:scale-95"
         >
           <Bot className="w-3.5 h-3.5" />
           <span>Synthesize</span>
         </button>
-      </div>
-
-      {/* MINIMAP */}
-      <div className="absolute bottom-6 right-6 w-36 h-24 glass-panel rounded-xl border border-white/10 overflow-hidden pointer-events-none p-1 z-30 hidden sm:block">
-        <div className="w-full h-full bg-black/40 rounded-lg relative">
-          <div className="absolute w-3 h-2 bg-amber-400/80 rounded-[2px]" style={{ left: '25%', top: '30%' }}></div>
-          <div className="absolute w-3 h-2 bg-emerald-400/80 rounded-[2px]" style={{ left: '30%', top: '65%' }}></div>
-          <div className="absolute border border-blue-400/70 rounded inset-2"></div>
-        </div>
       </div>
     </div>
   );

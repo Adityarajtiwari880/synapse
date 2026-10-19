@@ -993,290 +993,185 @@ export const DocumentReader: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* 1. CLEAN, ORGANIZED SINGLE-TIER TOOLBAR */}
-      <div className={`h-12 px-2.5 sm:px-3.5 border-b flex items-center justify-between text-xs shrink-0 select-none z-20 gap-2 ${
-        appSettings.theme === 'light'
-          ? 'bg-white/85 backdrop-blur-md border-slate-200 text-slate-700 shadow-sm'
-          : 'bg-black/35 backdrop-blur-md border-white/10 text-slate-400'
-      }`}>
-        
-        {/* Left Cluster: Zoom, Page Navigation, and View Format Toggle */}
-        <div className="flex items-center space-x-1.5 shrink-0">
-          {/* Zoom Controls */}
-          <div className={`flex items-center space-x-0.5 rounded-xl p-0.5 border ${
+          {/* 1. CLEAN APPLE-STYLE UNIFIED TOOLBAR */}
+          <div className={`h-11 px-3 sm:px-4 border-b flex items-center justify-between text-xs shrink-0 select-none z-20 gap-2 ${
             appSettings.theme === 'light'
-              ? 'bg-slate-100/90 border-slate-300/80 text-slate-700'
-              : 'bg-black/40 border-white/10 text-slate-300'
+              ? 'bg-white/85 backdrop-blur-md border-slate-200 text-slate-700 shadow-sm'
+              : 'bg-[#0f111a]/70 backdrop-blur-md border-white/10 text-slate-300'
           }`}>
-            <button
-              onClick={() => setReaderZoom(prev => Math.max(50, prev - 10))}
-              className="p-1 hover:text-blue-500 rounded-lg transition"
-              title="Zoom Out (Ctrl + Wheel Down or Pinch in)"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setReaderZoom(100)}
-              className="font-mono text-[11px] w-8 text-center select-none font-bold hover:text-blue-500 transition"
-              title="Reset to 100% Zoom"
-            >
-              {readerZoom}%
-            </button>
-            <button
-              onClick={() => setReaderZoom(prev => Math.min(250, prev + 10))}
-              className="p-1 hover:text-blue-500 rounded-lg transition"
-              title="Zoom In (Ctrl + Wheel Up or Pinch out)"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Page Navigator */}
-          <div className={`flex items-center space-x-0.5 rounded-xl p-0.5 border ${
-            appSettings.theme === 'light'
-              ? 'bg-slate-100/90 border-slate-300/80 text-slate-700'
-              : 'bg-black/40 border-white/10 text-slate-300'
-          }`}>
-            <button
-              onClick={() => setActivePageNumber(prev => Math.max(1, prev - 1))}
-              className="p-1 hover:text-blue-500 rounded-lg transition"
-              title="Previous Page"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-            <span className="font-mono text-[11px] px-1 select-none">
-              p. {activePageNumber} / {selectedDoc.pages || selectedDoc.parsedPdf?.totalPages || 1}
-            </span>
-            <button
-              onClick={() => setActivePageNumber(prev => Math.min(selectedDoc.pages || selectedDoc.parsedPdf?.totalPages || 1, prev + 1))}
-              className="p-1 hover:text-blue-500 rounded-lg transition"
-              title="Next Page"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* PDF Pages vs Text View (if parsed PDF is present) */}
-          {selectedDoc.parsedPdf && (
-            <div className={`hidden lg:flex p-0.5 rounded-xl border text-[10px] ${
-              appSettings.theme === 'light'
-                ? 'bg-slate-100/90 border-slate-300/80 text-slate-700'
-                : 'bg-black/40 border-white/10 text-slate-300'
-            }`}>
-              <button
-                onClick={() => setReaderViewMode('pages')}
-                className={`px-2 py-0.5 rounded-lg transition font-semibold ${
-                  readerViewMode === 'pages'
-                    ? 'bg-blue-600 text-white shadow-apple-glow'
-                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                }`}
-                title="Original Visual PDF Pages with Interactive Line Extraction"
-              >
-                Pages
-              </button>
-              <button
-                onClick={() => setReaderViewMode('text')}
-                className={`px-2 py-0.5 rounded-lg transition font-semibold ${
-                  readerViewMode === 'text'
-                    ? 'bg-blue-600 text-white shadow-apple-glow'
-                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                }`}
-                title="Pleated Squeeze Text View"
-              >
-                Text
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Center Cluster: VIEW MODE vs EDIT MODE + ACTION BUTTONS */}
-        <div className="flex items-center space-x-1.5 shrink-0">
-          <div className="flex items-center p-0.5 rounded-xl bg-black/50 border border-white/10 text-xs shadow-inner">
-            <button
-              onClick={() => {
-                setReaderInteractionMode('view');
-                setIsSnipMode(false);
-                setActiveInkTool('inactive');
-              }}
-              className={`px-2.5 py-1 rounded-lg transition flex items-center space-x-1.5 font-semibold ${
-                readerInteractionMode === 'view'
-                  ? 'bg-white text-slate-900 shadow-sm font-bold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              title="View Mode: Native clean reading & text selection"
-            >
-              <Eye className="w-3.5 h-3.5 text-blue-500" />
-              <span>View</span>
-            </button>
-
-            <button
-              onClick={() => setReaderInteractionMode('edit')}
-              className={`px-2.5 py-1 rounded-lg transition flex items-center space-x-1.5 font-semibold ${
-                readerInteractionMode === 'edit'
-                  ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              title="Edit & Snip Mode: Hover lines to snip or copy, highlight text, and run instant document analysis"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Edit & Snip</span>
-            </button>
-          </div>
-
-          {/* Quick Analysis Actions when in Edit Mode */}
-          {readerInteractionMode === 'edit' && (
-            <div className="flex items-center space-x-1 animate-in fade-in duration-150">
-              <button
-                onClick={handleRunPageAnalysis}
-                className="px-2 py-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-apple-glow flex items-center space-x-1 transition"
-                title="1-Click AI Analysis: Generates 4 linked puzzle cards (Thesis, 2 Evidence, Inquiry) on the Mind Map"
-              >
-                <Sparkles className="w-3 h-3 text-amber-300" />
-                <span className="hidden sm:inline">⚡ Analyze</span>
-              </button>
-
-              <button
-                onClick={handleHarvestHighlights}
-                className="px-2 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-500/30 text-amber-300 font-semibold text-xs flex items-center space-x-1 transition"
-                title="Harvest Highlights: Group all document highlights into a Mind Map Frame"
-              >
-                <Bookmark className="w-3 h-3 text-amber-400" />
-                <span className="hidden sm:inline">Harvest</span>
-              </button>
-
-              <button
-                onClick={handleAddStickyNote}
-                className="px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-semibold text-xs flex items-center space-x-1 transition"
-                title="Add Sticky Note on page"
-              >
-                <StickyNoteIcon className="w-3 h-3 text-yellow-300" />
-                <span className="hidden sm:inline">Note</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Right Cluster: Display Filter Popover, Upload Doc, Snip Area, Inking */}
-        <div className="flex items-center space-x-1.5 shrink-0">
-          {/* Eye-Care PDF Display Filter Dropdown Popover */}
-          <div className="relative" ref={filterMenuRef}>
-            <button
-              onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-              className={`px-2 py-1 rounded-xl transition font-medium flex items-center space-x-1 text-xs ${
-                isFilterMenuOpen
-                  ? 'bg-blue-600 text-white shadow-apple-glow'
-                  : 'bg-black/40 hover:bg-white/10 text-slate-300 border border-white/10'
-              }`}
-              title="Eye-Care Reading Filter (Natural, Warm Sepia, Dark Invert, Soft Contrast)"
-            >
-              <Palette className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline text-[11px]">
-                {PDF_FILTERS.find(f => f.id === appSettings.pdfColorFilter)?.label || 'Style'}
-              </span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
-
-            {isFilterMenuOpen && (
-              <div
-                onMouseDown={e => e.stopPropagation()}
-                className="absolute top-full right-0 mt-1.5 w-44 glass-panel border border-white/20 p-1.5 rounded-2xl shadow-2xl z-50 animate-in zoom-in-95 duration-100 space-y-0.5 select-none"
-              >
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/10">
-                  Reading Filter
-                </div>
-                {PDF_FILTERS.map(filter => (
-                  <button
-                    key={filter.id}
-                    onClick={() => {
-                      updateAppSettings({ pdfColorFilter: filter.id });
-                      setIsFilterMenuOpen(false);
-                    }}
-                    className={`w-full px-2 py-1.5 rounded-xl text-left transition flex items-center justify-between text-xs ${
-                      appSettings.pdfColorFilter === filter.id
-                        ? 'bg-blue-600/25 border border-blue-500/40 text-white font-semibold'
-                        : 'hover:bg-white/5 text-slate-300'
-                    }`}
-                  >
-                    <span className="flex items-center space-x-2">
-                      <span>{filter.icon}</span>
-                      <span>{filter.label}</span>
-                    </span>
-                    {appSettings.pdfColorFilter === filter.id && (
-                      <Check className="w-3.5 h-3.5 text-blue-400" />
-                    )}
-                  </button>
-                ))}
+            {/* Left: Document Info & Page Stepper */}
+            <div className="flex items-center space-x-2 shrink-0 min-w-0">
+              <div className="flex items-center space-x-1.5 p-1 px-2.5 rounded-xl bg-black/30 border border-white/10 text-slate-200 shrink-0">
+                <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <span className="font-semibold text-xs truncate max-w-[110px] sm:max-w-[160px] md:max-w-[220px]">
+                  {selectedDoc.title}
+                </span>
               </div>
-            )}
+
+              {/* Page Navigator */}
+              <div className="flex items-center space-x-0.5 p-0.5 rounded-xl bg-black/30 border border-white/10 text-xs text-slate-300 shrink-0">
+                <button
+                  onClick={() => setActivePageNumber(prev => Math.max(1, prev - 1))}
+                  className="p-1 hover:text-blue-400 rounded-lg transition active:scale-95"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <span className="font-mono text-[11px] px-1 select-none">
+                  {activePageNumber} / {selectedDoc.pages || selectedDoc.parsedPdf?.totalPages || 1}
+                </span>
+                <button
+                  onClick={() => setActivePageNumber(prev => Math.min(selectedDoc.pages || selectedDoc.parsedPdf?.totalPages || 1, prev + 1))}
+                  className="p-1 hover:text-blue-400 rounded-lg transition active:scale-95"
+                  title="Next Page"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Center: Clean Segmented Mode Selector (Read | Snip | Ink) */}
+            <div className="flex items-center p-0.5 rounded-xl bg-black/40 border border-white/10 text-xs shrink-0">
+              <button
+                onClick={() => {
+                  setReaderInteractionMode('view');
+                  setIsSnipMode(false);
+                  setActiveInkTool('inactive');
+                }}
+                className={`px-3 py-1 rounded-lg transition flex items-center space-x-1.5 font-medium ${
+                  readerInteractionMode === 'view' && !isSnipMode && activeInkTool === 'inactive'
+                    ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="Reading & text selection mode"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Read</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsSnipMode(!isSnipMode);
+                  setReaderInteractionMode('edit');
+                  setActiveInkTool('inactive');
+                }}
+                className={`px-3 py-1 rounded-lg transition flex items-center space-x-1.5 font-medium ${
+                  isSnipMode
+                    ? 'bg-amber-400 text-slate-950 shadow-apple-glow font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="Snip excerpts directly onto the Canvas"
+              >
+                <Scissors className="w-3.5 h-3.5" />
+                <span>Snip</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveInkTool(activeInkTool === 'pen' ? 'inactive' : 'pen');
+                  setIsSnipMode(false);
+                }}
+                className={`px-3 py-1 rounded-lg transition flex items-center space-x-1.5 font-medium ${
+                  activeInkTool !== 'inactive'
+                    ? 'bg-indigo-600 text-white shadow-apple-glow font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="Freehand Stylus & Highlighter Tool"
+              >
+                <PenTool className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Ink</span>
+              </button>
+            </div>
+
+            {/* Right: Quick Tools (Upload, Filter, Zoom Pill) */}
+            <div className="flex items-center space-x-1.5 shrink-0">
+              {/* Upload Document Button */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept=".pdf,.docx,.doc,.txt,.md,.rtf,.png,.jpg,.jpeg,.webp,.gif,.svg,.json,.csv,.tsv"
+                onChange={handleDocumentUpload}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="ios-glass-btn px-2.5 py-1 text-xs text-blue-400 hover:text-blue-300 flex items-center space-x-1 transition"
+                title="Upload document (PDF, Word, or Text)"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Upload</span>
+              </button>
+
+              {/* Eye-Care Display Filter Popover */}
+              <div className="relative" ref={filterMenuRef}>
+                <button
+                  onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+                  className={`ios-glass-btn p-1.5 rounded-xl transition ${isFilterMenuOpen ? 'border-cyan-400 text-cyan-300' : 'text-slate-300 hover:text-white'}`}
+                  title="Reading Style (Natural, Warm Sepia, Dark Invert, Soft Contrast)"
+                >
+                  <Palette className="w-3.5 h-3.5 text-cyan-400" />
+                </button>
+
+                {isFilterMenuOpen && (
+                  <div
+                    onMouseDown={e => e.stopPropagation()}
+                    className="absolute top-full right-0 mt-2 w-48 ios-glass border border-white/20 p-1.5 rounded-2xl shadow-2xl z-50 animate-in zoom-in-95 duration-100 space-y-0.5 select-none"
+                  >
+                    <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/10">
+                      Reading Filter
+                    </div>
+                    {PDF_FILTERS.map(filter => (
+                      <button
+                        key={filter.id}
+                        onClick={() => {
+                          updateAppSettings({ pdfColorFilter: filter.id });
+                          setIsFilterMenuOpen(false);
+                        }}
+                        className={`w-full px-2.5 py-1.5 rounded-xl text-left transition flex items-center justify-between text-xs ${
+                          appSettings.pdfColorFilter === filter.id
+                            ? 'bg-blue-600/25 border border-blue-500/40 text-white font-semibold'
+                            : 'hover:bg-white/5 text-slate-300'
+                        }`}
+                      >
+                        <span className="flex items-center space-x-2">
+                          <span>{filter.icon}</span>
+                          <span>{filter.label}</span>
+                        </span>
+                        {appSettings.pdfColorFilter === filter.id && (
+                          <Check className="w-3.5 h-3.5 text-blue-400" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Zoom Controls Pill */}
+              <div className="flex items-center space-x-0.5 p-0.5 rounded-xl bg-black/40 border border-white/10 text-slate-300">
+                <button
+                  onClick={() => setReaderZoom(prev => Math.max(50, prev - 10))}
+                  className="p-1 hover:text-blue-400 rounded-lg transition"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={handleFitWidth}
+                  className="font-mono text-[11px] px-1 hover:text-blue-400 transition font-bold"
+                  title="Click to Fit Width"
+                >
+                  {readerZoom}%
+                </button>
+                <button
+                  onClick={() => setReaderZoom(prev => Math.min(250, prev + 10))}
+                  className="p-1 hover:text-blue-400 rounded-lg transition"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
-
-          {/* Upload Document Button */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept=".pdf,.docx,.doc,.txt,.md,.rtf,.png,.jpg,.jpeg,.webp,.gif,.svg,.json,.csv,.tsv"
-            onChange={handleDocumentUpload}
-            className="hidden"
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="hidden md:flex px-2 py-1 rounded-xl bg-blue-600/20 hover:bg-blue-600/35 border border-blue-500/30 text-blue-400 text-xs font-semibold transition items-center space-x-1"
-            title="Upload any document (PDF, Word .docx, or Text)"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">+ Upload</span>
-          </button>
-
-          {/* LiquidText Snip Area Tool */}
-          <button
-            onClick={() => {
-              setIsSnipMode(!isSnipMode);
-              setReaderInteractionMode('edit');
-              setActiveInkTool('inactive');
-            }}
-            className={`px-2 py-1 rounded-xl transition flex items-center space-x-1 text-xs font-semibold ${
-              isSnipMode
-                ? 'bg-amber-400 text-slate-950 shadow-apple-glow animate-pulse'
-                : 'bg-white/5 border border-white/10 text-slate-300 hover:text-white'
-            }`}
-            title="Snip Area: Crop visual portion directly to Mind Map"
-          >
-            <Scissors className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">
-              {isSnipMode ? 'Snipping...' : '✂️ Snip'}
-            </span>
-          </button>
-
-          {/* Inking Tools: Pen & Highlighter */}
-          <div className="flex items-center space-x-0.5 p-0.5 rounded-xl bg-black/40 border border-white/10">
-            <button
-              onClick={() => {
-                setActiveInkTool(activeInkTool === 'pen' ? 'inactive' : 'pen');
-                setIsSnipMode(false);
-              }}
-              className={`p-1.5 rounded-lg transition ${
-                activeInkTool === 'pen' ? 'bg-blue-600 text-white shadow-apple-glow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Pen / Stylus Ink"
-            >
-              <PenTool className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveInkTool(activeInkTool === 'highlighter' ? 'inactive' : 'highlighter');
-                setIsSnipMode(false);
-              }}
-              className={`p-1.5 rounded-lg transition ${
-                activeInkTool === 'highlighter' ? 'bg-amber-500 text-black shadow-apple-glow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Highlighter"
-            >
-              <Highlighter className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* ACTIVE SNIP MODE CONTROLS STRIP (Only visible during crop drag) */}
       {isSnipMode && (
@@ -1750,13 +1645,13 @@ export const DocumentReader: React.FC = () => {
                   }}
                   className={`relative group transition-all duration-300 rounded-xl select-text ${
                     flashingParagraphId === p.id
-                      ? 'p-4 bg-amber-400/25 ring-4 ring-amber-400 scale-[1.02] shadow-[0_0_35px_rgba(251,191,36,0.6)]'
+                      ? 'p-4 bg-amber-400/20 ring-2 ring-amber-400 scale-[1.01] shadow-[0_0_30px_rgba(251,191,36,0.35)]'
                       : p.isHighlight
-                      ? 'p-4 bg-amber-400/15 border-l-4 border-amber-400 ring-1 ring-amber-400/20'
-                      : 'p-2 hover:bg-black/5 dark:hover:bg-white/5'
+                      ? 'p-4 bg-amber-500/10 dark:bg-amber-400/10 border-l-2 border-amber-400/80 rounded-r-xl'
+                      : 'p-3 hover:bg-black/5 dark:hover:bg-white/5'
                   }`}
                 >
-                  <div className="flex items-center justify-between text-[11px] font-sans text-slate-400 font-semibold tracking-wide mb-1">
+                  <div className="flex items-center justify-between text-[11px] font-sans text-slate-400 font-semibold tracking-wide mb-1.5">
                     <span>{p.section} · <span className="font-mono text-[10px]">p. {p.pageNumber}</span></span>
 
                     {/* Inline Actions in Edit Mode */}
@@ -1781,17 +1676,19 @@ export const DocumentReader: React.FC = () => {
                     )}
                   </div>
 
-                  <p className={`select-text ${p.isHighlight ? 'text-amber-300 italic' : ''}`}>
+                  <p className={`select-text text-sm leading-relaxed ${p.isHighlight ? 'text-amber-100 dark:text-amber-100 font-medium' : 'text-slate-300 dark:text-slate-200'}`}>
                     {p.text}
                   </p>
 
                   {p.isHighlight && (
-                    <div className="pt-2 text-[10px] font-sans text-amber-300/80 flex items-center justify-between not-italic">
-                      <span className="flex items-center">
-                        <Bookmark className="w-3 h-3 mr-1" />
-                        Visual Anchor &rarr; Linked to Workspace Card
+                    <div className="pt-2.5 flex items-center justify-between not-italic">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] font-medium shadow-sm">
+                        <Bookmark className="w-2.5 h-2.5 mr-1 text-amber-400" />
+                        <span>Linked to Canvas Note</span>
                       </span>
-                      <span className="text-blue-400 font-medium">Click Card on Right to Flash</span>
+                      <span className="text-[10px] text-blue-400 hover:text-blue-300 font-medium cursor-pointer transition">
+                        Click card to jump →
+                      </span>
                     </div>
                   )}
                 </div>
@@ -1889,65 +1786,6 @@ export const DocumentReader: React.FC = () => {
             <span>{snipToast}</span>
           </div>
         )}
-      </div>
-
-      {/* FLOATING APPLE-STYLE ZOOM HUD (Accessible by Touch, Pencil, and Mouse) */}
-      <div className={`absolute bottom-4 left-4 z-30 flex items-center space-x-1.5 p-1.5 rounded-2xl shadow-2xl backdrop-blur-xl select-none transition-all ${
-        appSettings.theme === 'light'
-          ? 'bg-white/90 border border-slate-300/80 text-slate-800 shadow-slate-300/50'
-          : 'bg-[#11131e]/90 border border-white/15 text-slate-200 shadow-black/60'
-      }`}>
-        <button
-          onClick={() => setReaderZoom(prev => Math.max(50, prev - 10))}
-          className="p-1.5 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition active:scale-95"
-          title="Zoom Out (Ctrl + Wheel Down or Pinch in)"
-        >
-          <ZoomOut className="w-3.5 h-3.5" />
-        </button>
-
-        <button
-          onClick={() => setReaderZoom(100)}
-          className="px-2 py-1 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 font-mono text-xs font-bold transition"
-          title="Reset to 100% Zoom"
-        >
-          {readerZoom}%
-        </button>
-
-        <button
-          onClick={() => setReaderZoom(prev => Math.min(250, prev + 10))}
-          className="p-1.5 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition active:scale-95"
-          title="Zoom In (Ctrl + Wheel Up or Pinch out)"
-        >
-          <ZoomIn className="w-3.5 h-3.5" />
-        </button>
-
-        <div className="w-px h-4 bg-slate-300 dark:bg-white/20 my-auto"></div>
-
-        <button
-          onClick={handleFitWidth}
-          className="px-2 py-1 rounded-xl bg-blue-600/15 hover:bg-blue-600/25 text-blue-600 dark:text-blue-400 text-[11px] font-semibold transition active:scale-95 flex items-center space-x-1"
-          title="Fit Page to Width (Double tap desk)"
-        >
-          <Maximize2 className="w-3 h-3" />
-          <span>Fit Width</span>
-        </button>
-
-        <div className="hidden sm:flex items-center space-x-0.5 pl-1 border-l border-slate-300 dark:border-white/15">
-          {[75, 100, 125, 150].map(pct => (
-            <button
-              key={pct}
-              onClick={() => setReaderZoom(pct)}
-              className={`px-1.5 py-0.5 rounded-lg text-[10px] font-mono transition ${
-                readerZoom === pct
-                  ? 'bg-blue-600 text-white font-bold shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
-              }`}
-              title={`Zoom to ${pct}%`}
-            >
-              {pct}%
-            </button>
-          ))}
-        </div>
       </div>
       </>
       )}

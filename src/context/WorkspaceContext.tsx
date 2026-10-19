@@ -104,16 +104,85 @@ interface WorkspaceContextType {
 }
 
 const NULL_DOC: DocumentItem = {
-  id: 'empty',
-  title: 'No Document',
-  authors: '',
-  year: new Date().getFullYear(),
-  pages: 1,
-  highlightsCount: 0,
-  fileSize: '0 B',
+  id: 'starter-doc',
+  title: 'Attention Is All You Need',
+  authors: 'Vaswani, Shazeer, Parmar, Uszkoreit, et al.',
+  year: 2017,
+  pages: 11,
+  highlightsCount: 2,
+  fileSize: '1.4 MB',
   fileType: 'pdf',
   ingestStatus: 'ready'
 };
+
+const STARTER_NODES: CanvasNode[] = [
+  {
+    id: 'starter-card-1',
+    type: 'claim',
+    title: 'Multi-Head Attention Mechanism',
+    content: 'Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions.',
+    x: 100,
+    y: 120,
+    color: '#6366f1',
+    width: 310,
+    height: 170,
+    puzzleLocked: false,
+    anchors: [
+      {
+        docId: 'starter-doc',
+        docTitle: 'Attention Is All You Need',
+        pageNumber: 4,
+        boxes: [],
+        quote: {
+          exact: 'Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions.'
+        },
+        charRange: { start: 1040, end: 1210 }
+      }
+    ],
+    createdAt: Date.now() - 3600000,
+    confidence: 1,
+    verificationState: 'verified',
+    origin: 'human'
+  },
+  {
+    id: 'starter-card-2',
+    type: 'evidence',
+    title: 'Parallel Computation Efficiency',
+    content: 'Total computational cost is similar to single-head attention with full dimensionality, enabling high parallel training throughput.',
+    x: 480,
+    y: 170,
+    color: '#0284c7',
+    width: 310,
+    height: 170,
+    puzzleLocked: false,
+    anchors: [
+      {
+        docId: 'starter-doc',
+        docTitle: 'Attention Is All You Need',
+        pageNumber: 4,
+        boxes: [],
+        quote: {
+          exact: 'Total computational cost is similar to single-head attention with full dimensionality.'
+        },
+        charRange: { start: 1320, end: 1490 }
+      }
+    ],
+    createdAt: Date.now() - 1800000,
+    confidence: 1,
+    verificationState: 'verified',
+    origin: 'human'
+  }
+];
+
+const STARTER_EDGES: CanvasEdge[] = [
+  {
+    id: 'starter-edge-1',
+    source: 'starter-card-1',
+    target: 'starter-card-2',
+    relation: 'extends',
+    label: 'Scales Architecture'
+  }
+];
 
 const DEFAULT_SETTINGS: AppSettings = {
   deviceMode: 'auto',
@@ -175,7 +244,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     addNode: supAddNode, updateNode: supUpdateNode, updateNodePos: supUpdateNodePos, updateNodesPos: supUpdateNodesPos, deleteNode: supDeleteNode,
     addEdge: supAddEdge, updateEdge: supUpdateEdge, deleteEdge: supDeleteEdge,
     addFrame: supAddFrame, deleteFrame: supDeleteFrame
-  } = useCanvas(activeMatter?.id ?? null, [], [], []);
+  } = useCanvas(activeMatter?.id ?? null, STARTER_NODES, STARTER_EDGES, []);
 
   const { uploadDocument, fetchDocuments, deleteDocument: supDeleteDocument } = useDocuments(activeMatter?.id ?? null, currentUser?.id ?? null);
 
