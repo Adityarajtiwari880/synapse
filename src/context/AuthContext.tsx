@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, pass: string) => Promise<boolean>;
   register: (name: string, email: string, pass: string) => Promise<boolean>;
   loginWithPasskey: () => Promise<boolean>;
+  loginAsGuest: () => void;
   logout: () => void;
   switchUserRole: (userId: string, newRole: Role) => void;
   toggleUserStatus: (userId: string) => void;
@@ -223,6 +224,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
+  // ─── GUEST INSTANT ACCESS (Testing bypass for rate limits) ───
+  const loginAsGuest = () => {
+    const guestUser: User = {
+      id: `usr-guest-${Date.now()}`,
+      name: 'Aditya (Guest)',
+      email: 'aditya.guest@synapse.internal',
+      role: 'admin',
+      status: 'active',
+      createdAt: new Date().toISOString().split('T')[0],
+      lastActive: 'Just now',
+    };
+    setCurrentUser(guestUser);
+    setSupabaseUserId(guestUser.id);
+    localStorage.setItem('synapse_current_user_id', guestUser.id);
+  };
+
   // ─── LOGOUT ───────────────────────────────────────────────
   const logout = async () => {
     if (isSupabaseConfigured) {
@@ -283,6 +300,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         loginWithPasskey,
+        loginAsGuest,
         logout,
         switchUserRole,
         toggleUserStatus,

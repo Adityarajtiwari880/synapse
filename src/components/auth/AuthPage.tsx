@@ -26,7 +26,7 @@ import { ProfessionalField } from '../../types';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export const AuthPage: React.FC = () => {
-  const { login, register, loginWithPasskey } = useAuth();
+  const { login, register, loginWithPasskey, loginAsGuest } = useAuth();
   const { navigateTo, switchField, appSettings, updateAppSettings } = useWorkspace();
 
   const isLight = appSettings.theme === 'light';
@@ -43,58 +43,22 @@ export const AuthPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-
   const [showLoginLoader, setShowLoginLoader] = useState(false);
-
-  // Corporate Domain SSO auto-detection
-  const isCorporateSSO =
-    email.toLowerCase().includes('@skadden.com') ||
-    email.toLowerCase().includes('@pfizer.com') ||
-    email.toLowerCase().includes('@blackrock.com') ||
-    email.toLowerCase().includes('@synapse.ai') ||
-    email.toLowerCase().includes('@oxford.edu');
 
   const handleAuthSuccess = () => {
     setShowLoginLoader(true);
     setTimeout(() => {
       setShowLoginLoader(false);
       navigateTo('dashboard');
-    }, 2000);
+    }, 1500);
   };
 
-  const handleGuestLogin = async () => {
+  const handleGuestLogin = () => {
     setIsSubmitting(true);
     setError(null);
-    const tempEmail = `guest_${Date.now()}@test.com`;
-    const tempPass = `guest_pass_1234`;
-    
-    // Attempt sign up. Because it's a test, we assume email confirm is disabled or they just want a mock session.
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: tempEmail,
-      password: tempPass,
-      options: { data: { name: 'Guest Tester' } }
-    });
-    
-    if (signUpError) {
-      // If it fails (e.g. rate limit), fallback to local mock login if we want, but since they want to test, we show the error.
-      setError(signUpError.message);
-      setIsSubmitting(false);
-      return;
-    }
-    
-    // Try to sign in just in case signUp didn't auto sign in
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: tempEmail,
-      password: tempPass
-    });
-    
-    if (signInError) {
-      setError("Account created but email confirmation is required. Please disable 'Confirm Email' in Supabase.");
-      setIsSubmitting(false);
-    } else {
-      switchField(selectedCategory);
-      handleAuthSuccess();
-    }
+    loginAsGuest();
+    switchField(selectedCategory);
+    handleAuthSuccess();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,12 +167,12 @@ export const AuthPage: React.FC = () => {
       )}
 
       {/* Global Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[130px] pointer-events-none rounded-full"></div>
-      <div className="absolute bottom-0 right-10 w-[500px] h-[300px] bg-indigo-500/10 blur-[120px] pointer-events-none rounded-full"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/15 blur-[140px] pointer-events-none rounded-full"></div>
+      <div className="absolute bottom-0 right-10 w-[500px] h-[300px] bg-indigo-500/15 blur-[130px] pointer-events-none rounded-full"></div>
 
       {/* Header */}
-      <header className={`px-6 py-4 flex items-center justify-between border-b z-20 backdrop-blur-md ${
-        isLight ? 'bg-white/80 border-slate-200 shadow-sm' : 'bg-[#07080f]/70 border-white/10'
+      <header className={`px-6 py-4 flex items-center justify-between border-b z-20 ios-glass ${
+        isLight ? 'border-slate-200' : 'border-white/10'
       }`}>
         <div
           className="flex items-center space-x-2.5 cursor-pointer"
@@ -218,7 +182,10 @@ export const AuthPage: React.FC = () => {
             <Layers className="w-4 h-4 text-white" />
           </div>
           <span className={`font-bold text-base tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>
-            Synapse Spatial Pro
+            Synapse
+          </span>
+          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-500 border border-blue-500/30">
+            Sign In
           </span>
         </div>
 
@@ -226,40 +193,33 @@ export const AuthPage: React.FC = () => {
           {/* Light / Dark Mode Toggle */}
           <button
             onClick={() => updateAppSettings({ theme: isLight ? 'dark' : 'light' })}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition flex items-center space-x-1.5 ${
-              isLight
-                ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                : 'bg-white/5 hover:bg-white/10 border-white/15 text-slate-300'
-            }`}
+            className="ios-glass-btn px-3 py-1.5 flex items-center space-x-1.5 font-semibold text-xs"
             title={isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
           >
             {isLight ? <Moon className="w-3.5 h-3.5 text-indigo-600" /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
-            <span className="hidden sm:inline">{isLight ? 'Dark' : 'Light'}</span>
+            <span>{isLight ? 'Dark' : 'Light'}</span>
           </button>
 
-          <span className="text-slate-400 hidden sm:inline">Protected by End-to-End Local Enclave</span>
+          {/* Glossy Back Button */}
           <button
             onClick={() => navigateTo('landing')}
-            className={`px-3 py-1.5 rounded-xl border transition flex items-center space-x-1.5 ${
-              isLight ? 'border-slate-300 text-slate-700 hover:bg-slate-100 shadow-sm' : 'bg-white/5 hover:bg-white/10 border-white/15 text-slate-200 backdrop-blur-md'
-            }`}
-            title="Back to Overview"
+            className="ios-glass-btn px-3.5 py-1.5 flex items-center space-x-1.5 font-semibold text-xs"
+            title="Return to Home Page"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Back to Overview</span>
+            <span>Back to Home</span>
           </button>
         </div>
       </header>
 
-
       {/* Main Form Centerpiece */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
+      <main className="flex-1 flex items-center justify-center px-4 py-10 relative z-10">
         <div className="w-full max-w-md">
-          {/* Glass Card */}
-          <div className="rounded-3xl bg-white/[0.04] border border-white/15 backdrop-blur-2xl p-7 shadow-2xl space-y-6">
-            {/* Header & Mode Switcher */}
+          {/* iOS Liquid Glass Card */}
+          <div className="ios-glass-card p-7 sm:p-8 space-y-6">
+            {/* Mode Switcher Segmented Control */}
             <div className="space-y-3 text-center">
-              <div className="inline-flex p-1 rounded-xl bg-black/40 border border-white/10 text-xs font-medium">
+              <div className="inline-flex p-1 rounded-2xl bg-black/10 dark:bg-black/40 border border-black/10 dark:border-white/10 text-xs font-semibold">
                 <button
                   type="button"
                   onClick={() => {
@@ -267,13 +227,13 @@ export const AuthPage: React.FC = () => {
                     setError(null);
                     setSuccessMsg(null);
                   }}
-                  className={`px-4 py-1.5 rounded-lg transition ${
+                  className={`px-5 py-2 rounded-xl transition ${
                     mode === 'login'
-                      ? 'bg-blue-600 text-white font-semibold shadow-apple-glow'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-blue-600 text-white shadow-apple-glow'
+                      : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  Enterprise Sign In
+                  Log In
                 </button>
                 <button
                   type="button"
@@ -282,98 +242,81 @@ export const AuthPage: React.FC = () => {
                     setError(null);
                     setSuccessMsg(null);
                   }}
-                  className={`px-4 py-1.5 rounded-lg transition ${
+                  className={`px-5 py-2 rounded-xl transition ${
                     mode === 'register'
-                      ? 'bg-blue-600 text-white font-semibold shadow-apple-glow'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-blue-600 text-white shadow-apple-glow'
+                      : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Create Account
                 </button>
               </div>
 
-              <h2 className="text-xl font-bold text-white tracking-tight">
-                {mode === 'login' ? 'Access Your Spatial Research Hub' : 'Register Corporate Workspace'}
+              <h2 className={`text-2xl font-extrabold tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                {mode === 'login' ? 'Welcome Back' : 'Create Your Account'}
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className={`text-xs ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                 {mode === 'login'
-                  ? 'Sign in via Corporate SSO or local cryptographic credentials.'
-                  : 'Get instant local-first access with zero cloud telemetry.'}
+                  ? 'Sign in to access your documents and reading notes.'
+                  : 'Start reading, highlighting, and connecting your documents.'}
               </p>
             </div>
 
             {/* Error or Success notification */}
             {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center space-x-2">
+              <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs flex items-center space-x-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
             {successMsg && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center space-x-2">
+              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs flex items-center space-x-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{successMsg}</span>
               </div>
             )}
 
-            {/* SSO BUTTONS */}
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!isSupabaseConfigured) return alert("Enterprise SSO requires configuration in Supabase Dashboard.");
-                    const { error } = await supabase.auth.signInWithOAuth({ provider: 'azure' });
-                    if (error) alert(error.message);
-                  }}
-                  className={`p-2.5 rounded-xl border text-xs font-medium transition flex items-center justify-center space-x-2 ${
-                    isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
-                  }`}
-                >
-                  <Building className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Okta / Azure</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!isSupabaseConfigured) return alert("Enterprise SSO requires configuration in Supabase Dashboard.");
-                    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-                    if (error) alert(error.message);
-                  }}
-                  className={`p-2.5 rounded-xl border text-xs font-medium transition flex items-center justify-center space-x-2 ${
-                    isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
-                  }`}
-                >
-                  <Globe className="w-3.5 h-3.5 text-cyan-500" />
-                  <span>Google SSO</span>
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={handlePasskey}
-                className="w-full p-2.5 rounded-xl bg-gradient-to-r from-blue-600/20 to-indigo-600/20 hover:from-blue-600/30 hover:to-indigo-600/30 border border-blue-500/30 text-xs font-semibold text-blue-500 transition flex items-center justify-center space-x-2"
-              >
-                <Fingerprint className="w-4 h-4 text-blue-500" />
-                <span>Sign in with Apple Touch ID / Passkey</span>
-              </button>
-              
-              {/* Skip Login / Guest Access Button */}
+            {/* ONE-CLICK INSTANT TEST / GUEST ACCESS BUTTON */}
+            <div className="space-y-2.5">
               <button
                 type="button"
                 onClick={handleGuestLogin}
                 disabled={isSubmitting}
-                className="w-full p-2.5 rounded-xl bg-gradient-to-r from-emerald-600/20 to-teal-600/20 hover:from-emerald-600/30 hover:to-teal-600/30 border border-emerald-500/30 text-xs font-bold text-emerald-400 transition flex items-center justify-center space-x-2 shadow-inner"
+                className="w-full py-3 px-4 rounded-2xl ios-glass-btn flex items-center justify-center space-x-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:border-emerald-500/50 shadow-sm"
+                title="Immediately test all features without needing to create an account"
               >
-                <Zap className="w-4 h-4 text-emerald-400" />
-                <span>Skip Login & Test Platform (Guest)</span>
+                <Zap className="w-4 h-4 text-emerald-500 fill-emerald-500" />
+                <span>Instant Test Access (1-Click Guest)</span>
               </button>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!isSupabaseConfigured) return alert("Google Sign-In requires Supabase configuration.");
+                    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+                    if (error) alert(error.message);
+                  }}
+                  className="ios-glass-btn py-2 px-3 text-xs font-medium flex items-center justify-center space-x-1.5"
+                >
+                  <Globe className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Google</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePasskey}
+                  className="ios-glass-btn py-2 px-3 text-xs font-medium flex items-center justify-center space-x-1.5"
+                >
+                  <Fingerprint className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>Apple ID</span>
+                </button>
+              </div>
             </div>
 
             <div className="relative flex py-1 items-center">
               <div className={`flex-grow border-t ${isLight ? 'border-slate-200' : 'border-white/10'}`}></div>
               <span className="flex-shrink mx-3 text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
-                Or Email Credentials
+                Or With Email
               </span>
               <div className={`flex-grow border-t ${isLight ? 'border-slate-200' : 'border-white/10'}`}></div>
             </div>
@@ -383,91 +326,84 @@ export const AuthPage: React.FC = () => {
               {/* Full Name (Registration only) */}
               {mode === 'register' && (
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Professional Full Name
+                  <label className={`block text-xs font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Your Name
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Sarah Jenkins, Esq."
+                      placeholder="e.g. Alex Taylor"
                       value={name}
                       onChange={e => setName(e.target.value)}
-                      className={`w-full pl-9 pr-3 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
-                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/30 border-white/15 text-white placeholder-slate-500'
+                      className={`w-full pl-10 pr-3 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
+                        isLight ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/40 border-white/15 text-white placeholder-slate-500'
                       }`}
                     />
                   </div>
                 </div>
               )}
 
-              {/* Industry Specialization (Login and Registration) */}
+              {/* Industry Specialization */}
               {(mode === 'login' || mode === 'register') && (
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Industry Category (Personalizes Your Dashboard)
+                  <label className={`block text-xs font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Your Field or Goal
                   </label>
                   <select
                     value={selectedCategory}
                     onChange={e => setSelectedCategory(e.target.value as ProfessionalField)}
-                    className={`w-full px-3 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
-                      isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-black/30 border-white/15 text-white'
+                    className={`w-full px-3 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
+                      isLight ? 'bg-white border-slate-300 text-slate-900' : 'bg-black/40 border-white/15 text-white'
                     }`}
                   >
-                    <option value="legal">⚖️ Legal & Litigation (M&A, Contracts, Depositions)</option>
-                    <option value="medical">🩺 Life Sciences & Clinical (Protocols, Trials, FDA)</option>
-                    <option value="business">💼 Private Equity & Finance (Deal Rooms, 10-K, Covenants)</option>
-                    <option value="academic">🔬 Academic & Research (Literature Reviews, Papers)</option>
+                    <option value="legal">⚖️ Legal & Contracts (Agreements, Clauses)</option>
+                    <option value="academic">🔬 Research & Studies (Papers, Books, Literature)</option>
+                    <option value="business">💼 Business & Finance (Reports, Proposals, Decks)</option>
+                    <option value="medical">🩺 Medical & Health (Protocols, Trials, Clinical)</option>
                   </select>
                 </div>
               )}
 
-              {/* Email (All modes except reset_password which uses the already typed email) */}
+              {/* Email */}
               {mode !== 'reset_password' && (
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Corporate or Academic Email
+                  <label className={`block text-xs font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     <input
                       type="email"
                       required
-                      placeholder="name@firm.com or name@institution.edu"
+                      placeholder="you@example.com"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className={`w-full pl-9 pr-3 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
-                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/30 border-white/15 text-white placeholder-slate-500'
+                      className={`w-full pl-10 pr-3 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
+                        isLight ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/40 border-white/15 text-white placeholder-slate-500'
                       }`}
                     />
                   </div>
-
-                  {isCorporateSSO && (mode === 'login' || mode === 'register') && (
-                    <div className="mt-1.5 p-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-[11px] text-blue-500 flex items-center space-x-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                      <span>Corporate SSO Enforced: Instant single sign-on active.</span>
-                    </div>
-                  )}
                 </div>
               )}
 
               {/* OTP Code (Only for reset_password) */}
               {mode === 'reset_password' && (
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
-                    6-Digit OTP Code
+                  <label className={`block text-xs font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    6-Digit Code
                   </label>
                   <div className="relative">
-                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     <input
                       type="text"
                       required
                       placeholder="Enter the code sent to your email"
                       value={otpCode}
                       onChange={e => setOtpCode(e.target.value)}
-                      className={`w-full pl-9 pr-3 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
-                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/30 border-white/15 text-white placeholder-slate-500'
+                      className={`w-full pl-10 pr-3 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
+                        isLight ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/40 border-white/15 text-white placeholder-slate-500'
                       }`}
                     />
                   </div>
@@ -478,7 +414,7 @@ export const AuthPage: React.FC = () => {
               {mode !== 'forgot_password' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className={`block text-xs font-medium ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    <label className={`block text-xs font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
                       {mode === 'reset_password' ? 'New Password' : 'Password'}
                     </label>
                     {mode === 'login' && (
@@ -489,22 +425,22 @@ export const AuthPage: React.FC = () => {
                           setError(null);
                           setSuccessMsg(null);
                         }}
-                        className="text-[10px] text-blue-500 hover:text-blue-400 font-semibold"
+                        className="text-[11px] text-blue-500 hover:text-blue-400 font-semibold"
                       >
                         Forgot Password?
                       </button>
                     )}
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       placeholder="••••••••••••"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className={`w-full pl-9 pr-9 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
-                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/30 border-white/15 text-white placeholder-slate-500'
+                      className={`w-full pl-10 pr-9 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
+                        isLight ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/40 border-white/15 text-white placeholder-slate-500'
                       }`}
                     />
                     <button
@@ -521,19 +457,19 @@ export const AuthPage: React.FC = () => {
               {/* Confirm Password */}
               {(mode === 'register' || mode === 'reset_password') && (
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Confirm {mode === 'reset_password' ? 'New Password' : 'Password'}
+                  <label className={`block text-xs font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Confirm Password
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       placeholder="••••••••••••"
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
-                      className={`w-full pl-9 pr-3 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
-                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/30 border-white/15 text-white placeholder-slate-500'
+                      className={`w-full pl-10 pr-3 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-blue-500 transition ${
+                        isLight ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400' : 'bg-black/40 border-white/15 text-white placeholder-slate-500'
                       }`}
                     />
                   </div>
@@ -543,13 +479,13 @@ export const AuthPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:brightness-110 active:scale-95 text-white text-xs font-semibold shadow-apple-glow transition flex items-center justify-center space-x-2 mt-2"
+                className="w-full py-3 rounded-2xl ios-glass-btn-primary flex items-center justify-center space-x-2 text-xs font-bold shadow-lg mt-3"
               >
                 <span>
-                  {mode === 'login' ? 'Authenticate & Enter' : 
-                   mode === 'register' ? 'Complete Registration' : 
-                   mode === 'forgot_password' ? 'Send OTP Code' : 
-                   'Update Password & Login'}
+                  {mode === 'login' ? 'Log In to Workspace' : 
+                   mode === 'register' ? 'Create Free Account' : 
+                   mode === 'forgot_password' ? 'Send Reset Code' : 
+                   'Update Password & Sign In'}
                 </span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -564,20 +500,18 @@ export const AuthPage: React.FC = () => {
                       setError(null);
                       setSuccessMsg(null);
                     }}
-                    className="text-[11px] text-slate-400 hover:text-slate-200 transition"
+                    className="text-xs text-blue-500 hover:underline transition font-semibold"
                   >
-                    Back to Login
+                    Back to Log In
                   </button>
                 </div>
               )}
             </form>
 
-
-
             {/* Security Guarantee */}
-            <div className="text-center pt-2 text-[10px] text-slate-400 flex items-center justify-center space-x-1.5">
-              <ShieldCheck className="w-3 h-3 text-emerald-500" />
-              <span>Zero-knowledge client keys · Plaintext never leaves your device</span>
+            <div className="text-center pt-2 text-[11px] text-slate-400 flex items-center justify-center space-x-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span>100% Private · Your notes stay safely on your device</span>
             </div>
           </div>
         </div>

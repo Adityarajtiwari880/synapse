@@ -51,154 +51,165 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen ${bg} ${textBase} flex flex-col font-sans selection:bg-blue-500/30 overflow-x-hidden`}>
-      {/* GLOSSY NAV BAR */}
-      <nav className={`sticky top-0 z-50 backdrop-blur-xl border-b px-4 sm:px-8 py-3.5 transition ${navBg}`}>
+      {/* iOS LIQUID GLASS NAV BAR */}
+      <nav className="sticky top-0 z-50 ios-glass border-b px-4 sm:px-8 py-3 transition">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigateTo('landing')}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-apple-glow">
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-apple-glow">
               <Layers className="w-5 h-5 text-white" />
             </div>
             <div className="flex items-center space-x-2">
               <span className={`font-bold text-lg tracking-tight ${headingText}`}>Synapse</span>
-              <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-500 border border-blue-500/30">
                 Spatial Pro
               </span>
             </div>
           </div>
 
-          <div className={`hidden lg:flex items-center space-x-7 text-xs font-medium ${navText}`}>
-            <button onClick={() => navigateTo('dashboard')} className="transition">
-              Dossiers &amp; Matters
+          {/* Simple, Beginner-Friendly Navigation Links */}
+          <div className={`hidden lg:flex items-center space-x-7 text-xs font-semibold ${navText}`}>
+            <button onClick={() => navigateTo('dashboard')} className="hover:text-blue-500 transition">
+              My Documents
             </button>
-            <button onClick={() => navigateTo('matrix')} className="transition">
-              Synthesis Matrix
+            <button onClick={() => navigateTo('matrix')} className="hover:text-blue-500 transition">
+              Compare Table
             </button>
-            <button onClick={() => navigateTo('trust')} className="transition">
-              Trust &amp; Security
+            <button onClick={() => navigateTo('trust')} className="hover:text-blue-500 transition">
+              Privacy &amp; Safety
             </button>
-            <button onClick={() => navigateTo('pricing')} className="transition">
+            <button onClick={() => navigateTo('pricing')} className="hover:text-blue-500 transition">
               Pricing
             </button>
-            <button onClick={() => navigateTo('docs')} className="transition">
-              Documentation
+            <button onClick={() => navigateTo('docs')} className="hover:text-blue-500 transition">
+              How It Works
             </button>
           </div>
 
+          {/* iOS Glass Controls: Day/Night Toggle, Log In & Register Buttons */}
           <div className="flex items-center space-x-2">
             {/* Day / Night Toggle */}
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-xl border transition flex items-center space-x-1.5 text-xs font-semibold ${
-                isLight
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                  : 'bg-white/5 hover:bg-white/10 border-white/15 text-slate-200'
-              }`}
+              className="ios-glass-btn p-2 sm:px-3 sm:py-1.5 flex items-center space-x-1.5 text-xs font-semibold"
               title={isLight ? 'Switch to Night Mode' : 'Switch to Day Mode'}
             >
               {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-400" />}
-              <span className="hidden lg:inline">{isLight ? 'Night' : 'Day'}</span>
+              <span className="hidden sm:inline">{isLight ? 'Night' : 'Day'}</span>
             </button>
 
             {isAuthenticated ? (
               <button
                 onClick={() => navigateTo('dashboard')}
-                className={`text-xs font-medium px-3.5 py-1.5 rounded-xl border transition ${
-                  isLight ? 'border-slate-300 text-slate-700 hover:bg-slate-100' : 'border-white/15 text-white hover:bg-white/10'
-                }`}
+                className="ios-glass-btn px-3.5 py-1.5 text-xs font-semibold flex items-center space-x-1.5"
               >
-                {currentUser?.name.split(' ')[0]}'s Hub
+                <span>{currentUser?.name.split(' ')[0]}'s Workspace</span>
               </button>
             ) : (
-              <button
-                onClick={() => navigateTo('auth')}
-                className={`hidden sm:block text-xs font-medium px-3.5 py-1.5 rounded-xl transition ${
-                  isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-300 hover:text-white'
-                }`}
-              >
-                Sign In
-              </button>
+              <>
+                {/* Simple Login Button in Glass Texture */}
+                <button
+                  onClick={() => navigateTo('auth')}
+                  className="ios-glass-btn px-3.5 py-1.5 text-xs font-semibold flex items-center space-x-1"
+                  title="Sign In with your account"
+                >
+                  <span>Log In</span>
+                </button>
+
+                {/* Register Button in Glass Texture */}
+                <button
+                  onClick={() => navigateTo('auth')}
+                  className="ios-glass-btn-primary px-3.5 sm:px-4 py-1.5 text-xs font-bold flex items-center space-x-1.5 shadow-apple-glow"
+                  title="Create a free account"
+                >
+                  <span>Register</span>
+                  <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
+                </button>
+              </>
             )}
+
+            {/* Direct Open Workspace Button */}
             <button
-              onClick={() => navigateTo('auth')}
-              className="text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-apple-glow transition flex items-center space-x-1.5 whitespace-nowrap"
+              onClick={() => navigateTo('workspace')}
+              className="hidden sm:flex ios-glass-btn px-3 py-1.5 text-xs font-semibold text-blue-500 items-center space-x-1"
+              title="Open the Reading Board immediately"
             >
-              <span>Launch</span>
-              <span className="hidden sm:inline"> Workspace</span>
-              <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
+              <span>Workspace</span>
             </button>
           </div>
         </div>
       </nav>
 
       {/* HERO SECTION */}
-      <section className="relative pt-16 pb-24 px-4 sm:px-8 overflow-hidden">
+      <section className="relative pt-14 pb-20 px-4 sm:px-8 overflow-hidden">
         {/* Glow ambient backdrops */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-blue-600/20 via-indigo-500/20 to-cyan-400/20 blur-[130px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-gradient-to-tr from-blue-600/20 via-indigo-500/20 to-cyan-400/20 blur-[140px] rounded-full pointer-events-none"></div>
 
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
-          {/* Badge */}
-          <div className={`inline-flex items-center space-x-2 px-3.5 py-1 rounded-full border backdrop-blur-md shadow-inner text-xs font-medium ${isLight ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-white/5 border-white/15 text-cyan-300'}`}>
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Industrial-Grade Spatial Research · Far Beyond LiquidText &amp; Paper</span>
+          {/* Simple Beginner-Friendly Badge */}
+          <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border backdrop-blur-md shadow-sm text-xs font-semibold ${
+            isLight ? 'bg-blue-50/80 border-blue-200 text-blue-600' : 'bg-white/10 border-white/15 text-cyan-300'
+          }`}>
+            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+            <span>A simpler, smarter way to read PDFs &amp; connect ideas</span>
           </div>
 
-          <h1 className={`text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1] ${headingText}`}>
+          {/* High-Contrast Title (Legible in both Light & Dark modes) */}
+          <h1 className={`text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.15] ${headingText}`}>
             Go past the limits of paper.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-300">
               See the connections others miss.
             </span>
           </h1>
 
           <p className={`text-base sm:text-lg max-w-2xl mx-auto font-normal leading-relaxed ${subText}`}>
-            Review complex agreements, clinical protocols, and scientific papers with the speed of thought.
-            Pinch documents to squeeze out irrelevant text, extract ideas onto an infinite synthesis canvas, and let grounded AI verify every fact with verbatim citations.
+            Read long documents with speed and ease. Pull key quotes onto an open visual board, connect ideas with a tap, and collapse unneeded pages with a simple pinch.
           </p>
 
-          {/* Primary Action Row */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
+          {/* Primary Action Row with iOS Glass Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
             <button
               onClick={() => navigateTo('auth')}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold text-sm shadow-apple-glow hover:brightness-110 active:scale-95 transition flex items-center justify-center space-x-2 group"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl ios-glass-btn-primary font-bold text-sm shadow-apple-glow flex items-center justify-center space-x-2 group cursor-pointer"
             >
-              <span>Launch Spatial Studio Free</span>
+              <span>Get Started Free</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
             </button>
             <button
-              onClick={() => navigateTo('auth')}
-              className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl border font-medium text-sm backdrop-blur-lg active:scale-95 transition flex items-center justify-center space-x-2 ${
-                isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm' : 'bg-white/5 hover:bg-white/10 border-white/15 text-white'
-              }`}
+              onClick={() => navigateTo('workspace')}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl ios-glass-btn font-semibold text-sm flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <Briefcase className="w-4 h-4 text-blue-400" />
-              <span>Explore Enterprise Dossiers</span>
+              <FileText className="w-4 h-4 text-blue-500" />
+              <span>Open Sample Document</span>
             </button>
           </div>
 
-          {/* Value Stats */}
-          <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto pt-10 border-t text-left ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
-            <div>
-              <div className={`text-2xl sm:text-3xl font-bold ${headingText}`}>4.2 hrs</div>
-              <div className={`text-xs ${subText}`}>Average weekly time saved per professional</div>
+          {/* 4 Simple Value Stats */}
+          <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto pt-10 border-t text-left ${
+            isLight ? 'border-slate-200' : 'border-white/10'
+          }`}>
+            <div className="ios-glass-card p-4">
+              <div className={`text-2xl sm:text-3xl font-extrabold ${headingText}`}>4+ Hours</div>
+              <div className={`text-xs mt-1 ${subText}`}>Saved every week on heavy reading</div>
             </div>
-            <div>
-              <div className={`text-2xl sm:text-3xl font-bold ${headingText}`}>60 FPS</div>
-              <div className={`text-xs ${subText}`}>Hardware pan/zoom over 2,000+ spatial nodes</div>
+            <div className="ios-glass-card p-4">
+              <div className={`text-2xl sm:text-3xl font-extrabold text-blue-500`}>Smooth</div>
+              <div className={`text-xs mt-1 ${subText}`}>Fast zoom &amp; scroll without lag</div>
             </div>
-            <div>
-              <div className={`text-2xl sm:text-3xl font-bold ${headingText}`}>100%</div>
-              <div className={`text-xs ${subText}`}>Verifiable quotes with exact page quad anchors</div>
+            <div className="ios-glass-card p-4">
+              <div className={`text-2xl sm:text-3xl font-extrabold text-indigo-500`}>1-Click</div>
+              <div className={`text-xs mt-1 ${subText}`}>Jump straight to any note's page</div>
             </div>
-            <div>
-              <div className={`text-2xl sm:text-3xl font-bold ${headingText}`}>0 Bytes</div>
-              <div className={`text-xs ${subText}`}>Cloud retention · 100% local-first on client hardware</div>
+            <div className="ios-glass-card p-4">
+              <div className={`text-2xl sm:text-3xl font-extrabold text-emerald-500`}>100%</div>
+              <div className={`text-xs mt-1 ${subText}`}>Private &amp; saved on your device</div>
             </div>
           </div>
         </div>
 
         {/* INTERACTIVE WORKSPACE SIMULATOR WIDGET */}
         <div className="max-w-6xl mx-auto mt-14 relative z-10">
-          <div className="relative rounded-3xl p-1 bg-gradient-to-b from-white/20 via-white/5 to-transparent shadow-2xl backdrop-blur-2xl">
-            <div className="rounded-[22px] bg-[#0c0d16] border border-white/10 overflow-hidden shadow-2xl">
+          <div className="ios-glass-card p-2 sm:p-3 overflow-hidden shadow-2xl">
+            <div className="rounded-2xl bg-[#0c0d16] border border-white/10 overflow-hidden shadow-2xl">
               {/* Window Header */}
               <div className="h-10 px-4 bg-black/50 border-b border-white/10 flex items-center justify-between text-xs text-slate-400">
                 <div className="flex items-center space-x-2">
@@ -207,10 +218,10 @@ export const LandingPage: React.FC = () => {
                     <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
                     <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
                   </div>
-                  <span className="text-[11px] font-mono text-slate-500 ml-2">Synapse Spatial Pro · Live Interactive Simulator</span>
+                  <span className="text-[11px] font-mono text-slate-400 ml-2">Synapse · Live Interactive Reading Board</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-[11px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                  <span className="text-[10px] text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20 font-semibold">
                     Interactive Preview
                   </span>
                 </div>
@@ -223,97 +234,96 @@ export const LandingPage: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <div>
-                        <div className="text-xs font-semibold text-white">Master Cloud Services Agreement</div>
-                        <div className="text-[10px] text-slate-400">Apex Global Holdings Ltd. · Page 4 of 18</div>
+                        <div className="text-xs font-semibold text-white">Sample Contract Agreement</div>
+                        <div className="text-[10px] text-slate-400">Services Agreement · Page 4 of 18</div>
                       </div>
                       <button
                         onClick={() => setHeroSqueezed(prev => !prev)}
-                        className={`text-xs px-2.5 py-1 rounded-lg font-medium transition flex items-center space-x-1.5 ${
+                        className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition flex items-center space-x-1.5 ${
                           heroSqueezed
                             ? 'bg-blue-600 text-white shadow-apple-glow'
-                            : 'bg-white/10 text-slate-300 hover:bg-white/15'
+                            : 'ios-glass-btn text-slate-200'
                         }`}
                       >
                         <Maximize2 className="w-3 h-3" />
-                        <span>{heroSqueezed ? 'Expand Full Text' : '⚡ Pinch Squeeze'}</span>
+                        <span>{heroSqueezed ? 'Show All Text' : '⚡ Fold / Squeeze'}</span>
                       </button>
                     </div>
 
                     <div className="space-y-2 text-xs leading-relaxed text-slate-300">
-                      <div className="p-2.5 rounded-lg bg-yellow-500/15 border border-yellow-500/30 text-yellow-200">
-                        <span className="text-[10px] font-bold uppercase text-yellow-400 block mb-0.5">Section 8.2 — Mutual Indemnity</span>
-                        "Provider shall indemnify, defend, and hold harmless Customer against any third-party claims alleging infringement of patent or copyright without aggregate liability caps."
+                      <div className="p-3 rounded-xl bg-yellow-500/15 border border-yellow-500/30 text-yellow-200">
+                        <span className="text-[10px] font-bold uppercase text-yellow-400 block mb-0.5">Key Clause 1 — Indemnity</span>
+                        "Provider shall indemnify, defend, and hold harmless Customer against third-party claims without aggregate liability caps."
                       </div>
 
                       {heroSqueezed ? (
                         <div className="py-2 flex items-center justify-center">
-                          <div className="h-6 w-full rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center space-x-2 text-[10px] text-blue-300 font-mono animate-pulse">
-                            <span>--- [14 unhighlighted paragraphs squeezed into fold] ---</span>
+                          <div className="h-7 w-full rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center space-x-2 text-[10px] text-blue-300 font-mono animate-pulse">
+                            <span>--- [14 unneeded paragraphs folded together] ---</span>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-slate-500 text-[11px] p-2 bg-white/[0.02] rounded border border-white/5">
-                          Standard boilerplate definitions of terms, payment mechanisms, invoicing intervals, tax jurisdiction clauses, and governing law clauses...
+                        <div className="text-slate-500 text-[11px] p-2 bg-white/[0.02] rounded-lg border border-white/5">
+                          Standard filler paragraphs, payment definitions, invoicing intervals, and routine boilerplate clauses...
                         </div>
                       )}
 
-                      <div className="p-2.5 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-200">
-                        <span className="text-[10px] font-bold uppercase text-blue-400 block mb-0.5">Section 12.4 — Gross Negligence Exclusion</span>
-                        "Neither party's limitation of liability under Section 12.1 shall apply to gross negligence, willful misconduct, or breach of confidentiality under Exhibit B."
+                      <div className="p-3 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-200">
+                        <span className="text-[10px] font-bold uppercase text-blue-400 block mb-0.5">Key Clause 2 — Liability Exclusion</span>
+                        "Neither party's limitation of liability shall apply to gross negligence, willful misconduct, or breach of confidentiality."
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-2 text-[10px] text-slate-500 flex items-center justify-between border-t border-white/5">
-                    <span>💡 Tap "Pinch Squeeze" to watch accordion fold in action</span>
-                    <span className="text-cyan-400 font-mono">2 Key Clauses Found</span>
+                  <div className="pt-2 text-[10px] text-slate-400 flex items-center justify-between border-t border-white/5">
+                    <span>💡 Tap "Fold / Squeeze" to hide unneeded text</span>
+                    <span className="text-cyan-400 font-semibold">2 Highlights Linked</span>
                   </div>
                 </div>
 
-                {/* Right: Spatial Canvas with Nodes & Bézier Curves */}
+                {/* Right: Notes Board with Cards & AI */}
                 <div className="p-5 relative overflow-hidden flex flex-col justify-between bg-radial-gradient">
-                  {/* Visual Nodes */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-300">Spatial Synthesis Canvas</span>
-                      <span className="text-[10px] text-emerald-400 flex items-center space-x-1">
+                      <span className="text-xs font-semibold text-slate-300">Connected Notes Board</span>
+                      <span className="text-[10px] text-emerald-400 flex items-center space-x-1 font-semibold">
                         <CheckCircle2 className="w-3 h-3" />
-                        <span>60 FPS Active</span>
+                        <span>Interactive &amp; Ready</span>
                       </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 relative">
-                      <div className="p-3 rounded-xl bg-white/5 border border-blue-500/40 shadow-lg text-xs space-y-1">
+                      <div className="p-3 rounded-2xl bg-white/5 border border-blue-500/30 shadow-lg text-xs space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-semibold text-blue-400">UNLIMITED INDEMNITY</span>
+                          <span className="text-[10px] font-bold text-blue-400">UNLIMITED INDEMNITY</span>
                           <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                         </div>
                         <p className="text-[11px] text-slate-200">
-                          IP claims bypass 1x ARR ceiling. Potential high exposure for licensor.
+                          IP claims bypass the standard ceiling. High exposure risk.
                         </p>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white/5 border border-purple-500/40 shadow-lg text-xs space-y-1">
+                      <div className="p-3 rounded-2xl bg-white/5 border border-purple-500/30 shadow-lg text-xs space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-semibold text-purple-400">CARVE-OUT OVERLAP</span>
+                          <span className="text-[10px] font-bold text-purple-400">CARVE-OUT EXCEPTION</span>
                           <span className="w-2 h-2 rounded-full bg-purple-400"></span>
                         </div>
                         <p className="text-[11px] text-slate-200">
-                          Gross negligence provision aligns with indemnity exception.
+                          Gross negligence provision directly matches the indemnity exception.
                         </p>
                       </div>
                     </div>
 
-                    {/* Grounded AI Citation pill */}
-                    <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs flex items-start space-x-2.5">
+                    {/* AI Citation card */}
+                    <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-xs flex items-start space-x-2.5">
                       <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                       <div>
-                        <div className="text-[11px] font-semibold text-cyan-300">Grounded AI Synthesis</div>
-                        <p className="text-[10px] text-slate-300 mt-0.5">
-                          "Mutual liability is bounded at \$2.5M direct damages, but Section 8.2 creates uncapped indemnity for third-party IP infringement."
+                        <div className="text-[11px] font-bold text-cyan-300">AI Assistant Summary</div>
+                        <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                          "Mutual liability is limited to \$2.5M, but Section 8.2 creates uncapped indemnity for third-party copyright claims."
                         </p>
-                        <span className="inline-block mt-1 text-[9px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/30">
-                          [Contract p. 4, §8.2]
+                        <span className="inline-block mt-1.5 text-[9px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-500/30">
+                          [Page 4, §8.2]
                         </span>
                       </div>
                     </div>
@@ -322,9 +332,9 @@ export const LandingPage: React.FC = () => {
                   <div className="pt-2 text-center">
                     <button
                       onClick={() => navigateTo('workspace')}
-                      className="text-xs font-semibold text-white px-4 py-2 rounded-xl bg-blue-600/80 hover:bg-blue-600 transition inline-flex items-center space-x-1.5 shadow-apple-glow"
+                      className="ios-glass-btn-primary text-xs font-bold px-5 py-2.5 inline-flex items-center space-x-2 shadow-apple-glow cursor-pointer"
                     >
-                      <span>Open Full Interactive Workspace</span>
+                      <span>Open Reading Board</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -335,76 +345,68 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* WHY SYNAPSE SURPASSES LIQUIDTEXT & PAPER */}
+      {/* WHY SYNAPSE SURPASSES PAPER */}
       <section className={`py-20 px-4 sm:px-8 border-t ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-[#07080e]'}`}>
         <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-            <h2 className="text-xs uppercase font-bold tracking-widest text-cyan-500">Beyond Traditional Tools</h2>
-            <p className={`text-3xl sm:text-4xl font-extrabold ${headingText}`}>Why Professionals Choose Synapse Pro</p>
+          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+            <h2 className="text-xs uppercase font-bold tracking-widest text-blue-500">Why It's Better</h2>
+            <p className={`text-3xl sm:text-4xl font-extrabold ${headingText}`}>A Better Way to Read Complex Documents</p>
             <p className={`text-sm ${subText}`}>
-              Traditional paper scatters your thoughts. Proprietary note apps lock your data into silos. Synapse gives you complete spatial mastery with open, local-first power.
+              Physical paper scatters your notes. Basic PDF readers make you flip back and forth. Synapse lets you see connected ideas side-by-side on an open visual board.
             </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className={`w-full text-left border-collapse text-xs rounded-2xl overflow-hidden`}>
+          <div className="ios-glass-card overflow-x-auto p-4 sm:p-6">
+            <table className={`w-full text-left border-collapse text-xs`}>
               <thead>
                 <tr className={`border-b font-semibold uppercase tracking-wider ${isLight ? 'border-slate-200 text-slate-500' : 'border-white/10 text-slate-400'}`}>
-                  <th className="py-4 px-4">Capability</th>
-                  <th className="py-4 px-4">LiquidText</th>
-                  <th className="py-4 px-4">Physical Paper</th>
-                  <th className={`py-4 px-4 font-bold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    Synapse Spatial Pro
+                  <th className="py-3 px-4">Feature</th>
+                  <th className="py-3 px-4">Regular PDF Reader</th>
+                  <th className="py-3 px-4">Paper Binders</th>
+                  <th className={`py-3 px-4 font-bold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
+                    Synapse
                   </th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${isLight ? 'divide-slate-100 text-slate-600' : 'divide-white/5 text-slate-300'}`}>
                 <tr>
-                  <td className={`py-3.5 px-4 font-semibold ${headingText}`}>Document Squeeze</td>
-                  <td className="py-3.5 px-4">Basic pinch</td>
-                  <td className="py-3.5 px-4 text-red-400/80">Impossible (folds physically)</td>
-                  <td className={`py-3.5 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    Two-Mode (Pinch Highlights + Pinch Query Search)
+                  <td className={`py-3 px-4 font-semibold ${headingText}`}>Collapse Pages (Squeeze)</td>
+                  <td className="py-3 px-4 text-slate-400">No</td>
+                  <td className="py-3 px-4 text-slate-400">No (folds physically)</td>
+                  <td className={`py-3 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
+                    Pinch to fold blank pages &amp; see highlights side-by-side
                   </td>
                 </tr>
                 <tr>
-                  <td className={`py-3.5 px-4 font-semibold ${headingText}`}>Device Adaptation</td>
-                  <td className="py-3.5 px-4">iPad-centric; cramped desktop</td>
-                  <td className="py-3.5 px-4">Heavy binders, desks only</td>
-                  <td className={`py-3.5 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    Native iPadOS Touch Bar vs. MacBook Resizable Sash
+                  <td className={`py-3 px-4 font-semibold ${headingText}`}>Visual Notes Board</td>
+                  <td className="py-3 px-4 text-slate-400">Tiny comment margin only</td>
+                  <td className="py-3 px-4 text-slate-400">Scattered sticky notes</td>
+                  <td className={`py-3 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
+                    Infinite canvas with 1-click jump back to PDF page
                   </td>
                 </tr>
                 <tr>
-                  <td className={`py-3.5 px-4 font-semibold ${headingText}`}>Verifiable Grounded AI</td>
-                  <td className="py-3.5 px-4 text-red-400/80">None / basic generic chat</td>
-                  <td className="py-3.5 px-4 text-red-400/80">Manual cross-referencing</td>
-                  <td className={`py-3.5 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    Sentence-level quotes with 1-click synthesis cards
+                  <td className={`py-3 px-4 font-semibold ${headingText}`}>Grounded AI Assistant</td>
+                  <td className="py-3 px-4 text-slate-400">Generic chatbot</td>
+                  <td className="py-3 px-4 text-slate-400">None</td>
+                  <td className={`py-3 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
+                    Answers grounded directly in your PDF with exact citations
                   </td>
                 </tr>
                 <tr>
-                  <td className={`py-3.5 px-4 font-semibold ${headingText}`}>Freehand Inking</td>
-                  <td className="py-3.5 px-4">Proprietary ink strokes</td>
-                  <td className="py-3.5 px-4 text-emerald-500">Natural pen</td>
-                  <td className={`py-3.5 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    Retina 60 FPS inking + Apple Pencil pressure + palm reject
+                  <td className={`py-3 px-4 font-semibold ${headingText}`}>Touch, Stylus &amp; Mouse</td>
+                  <td className="py-3 px-4 text-slate-400">Mouse only</td>
+                  <td className="py-3 px-4 text-emerald-500">Pen only</td>
+                  <td className={`py-3 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
+                    Native Apple Pencil inking, touch gestures, and mouse
                   </td>
                 </tr>
                 <tr>
-                  <td className={`py-3.5 px-4 font-semibold ${headingText}`}>Executive Deliverables</td>
-                  <td className="py-3.5 px-4">Proprietary project file</td>
-                  <td className="py-3.5 px-4">Scanning &amp; retyping</td>
-                  <td className={`py-3.5 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    1-Click Word (.doc) Memos, Obsidian &amp; JSON Canvas
-                  </td>
-                </tr>
-                <tr>
-                  <td className={`py-3.5 px-4 font-semibold ${headingText}`}>Data Privacy &amp; Sovereignty</td>
-                  <td className="py-3.5 px-4">Cloud subscription servers</td>
-                  <td className="py-3.5 px-4 text-yellow-500">Physical risk / leaks</td>
-                  <td className={`py-3.5 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
-                    100% Local-first default · Zero Cloud Storage Lock-in
+                  <td className={`py-3 px-4 font-semibold ${headingText}`}>Privacy &amp; Safety</td>
+                  <td className="py-3 px-4 text-slate-400">Uploaded to third-party servers</td>
+                  <td className="py-3 px-4 text-slate-400">Physical loss risk</td>
+                  <td className={`py-3 px-4 font-semibold border-l border-r ${isLight ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-cyan-300 bg-blue-600/10 border-blue-500/20'}`}>
+                    100% on your device · Your files never leave your browser
                   </td>
                 </tr>
               </tbody>
@@ -414,11 +416,11 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* SOLUTIONS BY INDUSTRY */}
-      <section className={`py-20 px-4 sm:px-8 ${isLight ? 'bg-white' : 'bg-[#090a11]'}`}>
+      <section className={`py-20 px-4 sm:px-8 ${isLight ? 'bg-white/80' : 'bg-[#090a11]'}`}>
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <h2 className="text-xs uppercase font-bold tracking-widest text-blue-500">Tailored For Your Profession</h2>
-            <p className={`text-3xl sm:text-4xl font-extrabold ${headingText}`}>Engineered For High-Stakes Knowledge Work</p>
+            <h2 className="text-xs uppercase font-bold tracking-widest text-blue-500">Made For Your Work</h2>
+            <p className={`text-3xl sm:text-4xl font-extrabold ${headingText}`}>Tailored To How You Read &amp; Research</p>
           </div>
 
           {/* Industry Tabs */}
@@ -431,7 +433,7 @@ export const LandingPage: React.FC = () => {
                 }`}
               >
                 <Scale className="w-3.5 h-3.5" />
-                <span>Legal &amp; Litigation</span>
+                <span>Legal &amp; Contracts</span>
               </button>
               <button
                 onClick={() => setActiveTab('medical')}
@@ -440,7 +442,7 @@ export const LandingPage: React.FC = () => {
                 }`}
               >
                 <Stethoscope className="w-3.5 h-3.5" />
-                <span>Life Sciences &amp; Clinical</span>
+                <span>Medical &amp; Health</span>
               </button>
               <button
                 onClick={() => setActiveTab('finance')}
@@ -449,7 +451,7 @@ export const LandingPage: React.FC = () => {
                 }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
-                <span>Private Equity &amp; Due Diligence</span>
+                <span>Business &amp; Finance</span>
               </button>
               <button
                 onClick={() => setActiveTab('research')}
@@ -458,29 +460,29 @@ export const LandingPage: React.FC = () => {
                 }`}
               >
                 <GraduationCap className="w-3.5 h-3.5" />
-                <span>Academic &amp; Science</span>
+                <span>Research &amp; Study</span>
               </button>
             </div>
           </div>
 
           {/* Industry Details Card */}
-          <div className={`p-8 rounded-3xl border backdrop-blur-xl grid grid-cols-1 md:grid-cols-3 gap-8 items-center ${isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-white/[0.03] border-white/10'}`}>
+          <div className="ios-glass-card p-6 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
             <div className="md:col-span-2 space-y-4">
               {activeTab === 'legal' && (
                 <>
-                  <div className="text-xs uppercase font-bold text-amber-500 tracking-wider">Corporate Counsel &amp; Litigators</div>
-                  <h3 className={`text-2xl font-bold ${headingText}`}>Extract M&amp;A Indemnity Risks and Cross-Examine Depositions</h3>
+                  <div className="text-xs uppercase font-bold text-amber-500 tracking-wider">Legal &amp; Contracts</div>
+                  <h3 className={`text-2xl font-bold ${headingText}`}>Review Contracts &amp; Spot Critical Risks Faster</h3>
                   <p className={`text-sm leading-relaxed ${subText}`}>
-                    Compare purchase agreements and disclosure schedules side-by-side. Pull clauses onto the spatial canvas to map indemnity caps against carve-out exclusions. Export instant Word (.doc) legal memorandums for your client briefings with zero manual reformatting.
+                    Compare agreements side-by-side. Extract clauses onto an open visual board, connect indemnity rules to liability caps, and export a clean Word document report with 1 click.
                   </p>
                   <ul className={`space-y-2 text-xs ${subText}`}>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Pinpoint contradictory statements across multi-volume deposition transcripts</span>
+                      <span>Compare two clauses side-by-side without flipping back and forth</span>
                     </li>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Two-way golden anchor flash jumping from memo cards back into agreement text</span>
+                      <span>Click any note on your board to jump straight to the source paragraph</span>
                     </li>
                   </ul>
                 </>
@@ -488,19 +490,19 @@ export const LandingPage: React.FC = () => {
 
               {activeTab === 'medical' && (
                 <>
-                  <div className="text-xs uppercase font-bold text-emerald-500 tracking-wider">Physicians &amp; Principal Investigators</div>
-                  <h3 className={`text-2xl font-bold ${headingText}`}>Synthesize Clinical Protocols and FDA 510(k) Submissions</h3>
+                  <div className="text-xs uppercase font-bold text-emerald-500 tracking-wider">Clinical &amp; Healthcare</div>
+                  <h3 className={`text-2xl font-bold ${headingText}`}>Digest Clinical Trials &amp; Study Protocols in Minutes</h3>
                   <p className={`text-sm leading-relaxed ${subText}`}>
-                    Review hundreds of trial pages in minutes. Use Pinch Squeeze to isolate adverse event tables, dosage escalations, and exclusion criteria across multi-center protocols.
+                    Review hundreds of study pages effortlessly. Use page squeezing to isolate dosage tables, patient criteria, and outcomes side-by-side.
                   </p>
                   <ul className={`space-y-2 text-xs ${subText}`}>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Side-by-side cohort outcome comparisons in the structured Synthesis Matrix</span>
+                      <span>Compare study results side-by-side in a clean table</span>
                     </li>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>HIPAA-compliant on-device processing guarantees patient data never leaves hardware</span>
+                      <span>100% private on-device reading ensures sensitive data stays confidential</span>
                     </li>
                   </ul>
                 </>
@@ -508,19 +510,19 @@ export const LandingPage: React.FC = () => {
 
               {activeTab === 'finance' && (
                 <>
-                  <div className="text-xs uppercase font-bold text-cyan-500 tracking-wider">Investment Banking &amp; PE Analysts</div>
-                  <h3 className={`text-2xl font-bold ${headingText}`}>Uncover Hidden Liabilities in Credit Agreements and 10-K Filings</h3>
+                  <div className="text-xs uppercase font-bold text-cyan-500 tracking-wider">Business &amp; Finance</div>
+                  <h3 className={`text-2xl font-bold ${headingText}`}>Analyze Financial Reports &amp; Deals Without Friction</h3>
                   <p className={`text-sm leading-relaxed ${subText}`}>
-                    Dissect deal rooms in record time. Connect covenants, EBITDA definition adjustments, and debt baskets visually on an infinite canvas to reveal non-obvious deal risks.
+                    Break down complex 10-K filings, pitch decks, and agreements. Pull key numbers and covenants onto your board to see trends clearly.
                   </p>
                   <ul className={`space-y-2 text-xs ${subText}`}>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Pinch Search to align covenant definitions across competing credit facilities</span>
+                      <span>Highlight and extract financial definitions onto your board</span>
                     </li>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Generate formatted Investment Committee briefing decks with verbatim anchors</span>
+                      <span>Export clean executive briefing notes in seconds</span>
                     </li>
                   </ul>
                 </>
@@ -528,19 +530,19 @@ export const LandingPage: React.FC = () => {
 
               {activeTab === 'research' && (
                 <>
-                  <div className="text-xs uppercase font-bold text-purple-500 tracking-wider">Scientists &amp; PhD Researchers</div>
-                  <h3 className={`text-2xl font-bold ${headingText}`}>Accelerate Literature Reviews and Mathematical Syntheses</h3>
+                  <div className="text-xs uppercase font-bold text-purple-500 tracking-wider">Academic &amp; Research</div>
+                  <h3 className={`text-2xl font-bold ${headingText}`}>Supercharge Literature Reviews &amp; Thesis Reading</h3>
                   <p className={`text-sm leading-relaxed ${subText}`}>
-                    Synthesize dozen-paper literature corpuses without drowning in open browser tabs. Draw proof derivations with Apple Pencil and connect empirical results directly into the Synthesis Matrix.
+                    Read multiple scientific papers without drowning in browser tabs. Draw diagrams with Apple Pencil and build a visual map of citations.
                   </p>
                   <ul className={`space-y-2 text-xs ${subText}`}>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Export directly to Obsidian Markdown and JSON Canvas for external Zettelkasten systems</span>
+                      <span>Export notes to Obsidian Markdown or clean PDF summaries</span>
                     </li>
                     <li className="flex items-center space-x-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Ask Library grounded AI assistant searches across entire PDF libraries simultaneously</span>
+                      <span>Ask AI questions across multiple open documents at once</span>
                     </li>
                   </ul>
                 </>
@@ -549,37 +551,35 @@ export const LandingPage: React.FC = () => {
               <div className="pt-3">
                 <button
                   onClick={() => navigateTo('workspace')}
-                  className={`text-xs font-semibold px-5 py-2.5 rounded-xl border transition inline-flex items-center space-x-1.5 ${
-                    isLight ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700' : 'bg-white/10 hover:bg-white/15 text-white border-white/15'
-                  }`}
+                  className="ios-glass-btn px-5 py-2.5 text-xs font-semibold inline-flex items-center space-x-1.5"
                 >
-                  <span>Launch Preset For This Industry</span>
-                  <ChevronRight className="w-4 h-4 text-blue-400" />
+                  <span>Try It In Reading Board</span>
+                  <ChevronRight className="w-4 h-4 text-blue-500" />
                 </button>
               </div>
             </div>
 
-            {/* Quote Testimonial Card */}
+            {/* Testimonial Card */}
             <div className={`p-6 rounded-2xl border flex flex-col justify-between space-y-4 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-black/40 border-white/10'}`}>
-              <Quote className="w-6 h-6 text-blue-400 opacity-60" />
+              <Quote className="w-6 h-6 text-blue-500 opacity-60" />
               <p className={`text-xs italic leading-relaxed ${isLight ? 'text-slate-700' : 'text-slate-200'}`}>
                 {activeTab === 'legal' &&
-                  "\"It's the fastest way I've come across to look at a document one time and make meaningful notes that I can quickly come back to. Really genius.\""}
+                  "\"The fastest way to review a long contract once and create clean notes that I can jump back to with 1 click. Truly brilliant.\""}
                 {activeTab === 'medical' &&
-                  "\"The comprehension goes up... I'm doing things that would've taken me 100 pieces of paper and 4 highlighters before.\""}
+                  "\"I'm doing things that used to take 100 printed pages and 4 highlighters. It completely clears the clutter.\""}
                 {activeTab === 'finance' &&
-                  "\"I picked up about 4 hours per week in productivity reading and analyzing contract riders for our acquisitions.\""}
+                  "\"Saved me about 4 hours every week reviewing agreements and financial reports.\""}
                 {activeTab === 'research' &&
-                  "\"This app is why you buy an iPad Pro and a MacBook together. Your ability to digest literature is given superpowers.\""}
+                  "\"Reading complex literature and connecting formulas on an open board makes studying enjoyable again.\""}
               </p>
               <div className={`border-t pt-3 ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
                 <div className={`text-xs font-bold ${headingText}`}>
-                  {activeTab === 'legal' && 'B.H. · Defense Litigation Partner, California'}
-                  {activeTab === 'medical' && 'Dr. J.H. · Principal Clinical Investigator, Boston'}
-                  {activeTab === 'finance' && 'P.H. · Corporate Acquisition Executive, Ohio'}
-                  {activeTab === 'research' && 'A.R. · Postdoctoral Fellow, Cambridge'}
+                  {activeTab === 'legal' && 'B.H. · Legal Counsel'}
+                  {activeTab === 'medical' && 'Dr. J.H. · Clinical Researcher'}
+                  {activeTab === 'finance' && 'P.H. · Acquisition Director'}
+                  {activeTab === 'research' && 'A.R. · University Researcher'}
                 </div>
-                <div className={`text-[10px] ${subText}`}>Verified Professional User</div>
+                <div className={`text-[10px] ${subText}`}>Verified User</div>
               </div>
             </div>
           </div>
@@ -590,26 +590,24 @@ export const LandingPage: React.FC = () => {
       <section className={`py-20 px-4 sm:px-8 relative overflow-hidden ${isLight ? 'bg-gradient-to-b from-slate-100 to-slate-200' : 'bg-gradient-to-b from-[#090a11] to-[#040508]'}`}>
         <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
           <h2 className={`text-3xl sm:text-5xl font-extrabold tracking-tight ${headingText}`}>
-            Ready to experience the future of reading?
+            Ready to read and take notes without limits?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${subText}`}>
-            Run it directly in your browser with zero install, zero cloud lock-in, and zero cost default.
+            Works directly in your browser with no installation needed. 100% private and free to try.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <button
               onClick={() => navigateTo('workspace')}
-              className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold text-sm shadow-apple-glow hover:brightness-110 active:scale-95 transition flex items-center space-x-2"
+              className="ios-glass-btn-primary px-8 py-3.5 font-bold text-sm shadow-apple-glow flex items-center justify-center space-x-2"
             >
-              <span>Launch Synapse Spatial Pro</span>
+              <span>Open Reading Board Free</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => navigateTo('auth')}
-              className={`px-6 py-3.5 rounded-2xl border font-medium text-sm transition ${
-                isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-white/5 hover:bg-white/10 border-white/15 text-white'
-              }`}
+              className="ios-glass-btn px-6 py-3.5 font-semibold text-sm flex items-center justify-center space-x-2"
             >
-              Enterprise Sign In / SSO
+              <span>Log In / Create Account</span>
             </button>
           </div>
         </div>
@@ -623,43 +621,41 @@ export const LandingPage: React.FC = () => {
               <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white">
                 <Layers className="w-4 h-4" />
               </div>
-              <span className={`font-bold text-base ${headingText}`}>Synapse Spatial Pro</span>
+              <span className={`font-bold text-base ${headingText}`}>Synapse</span>
             </div>
             <p className={`text-xs max-w-sm ${subText}`}>
-              The premier local-first spatial research and document synthesis platform for legal, medical, and strategic decision makers.
+              The simple, powerful visual reading and notes platform. Connect quotes, collapse unneeded pages, and understand your documents faster.
             </p>
             <div className={`text-[11px] ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
-              © 2026 Synapse Technologies Inc. All rights reserved. Zero-Budget Local Architecture.
+              © 2026 Synapse Technologies. All rights reserved.
             </div>
           </div>
 
           <div>
-            <h4 className={`font-semibold uppercase tracking-wider text-[11px] mb-3 ${headingText}`}>Product</h4>
+            <h4 className={`font-semibold uppercase tracking-wider text-[11px] mb-3 ${headingText}`}>Features</h4>
             <ul className="space-y-2">
-              <li><button onClick={() => navigateTo('workspace')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Spatial Workspace</button></li>
-              <li><button onClick={() => navigateTo('dashboard')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Dossiers &amp; Matters</button></li>
-              <li><button onClick={() => navigateTo('matrix')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Synthesis Matrix</button></li>
-              <li><button onClick={() => navigateTo('pricing')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Enterprise Pricing</button></li>
+              <li><button onClick={() => navigateTo('workspace')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Reading Board</button></li>
+              <li><button onClick={() => navigateTo('dashboard')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>My Documents</button></li>
+              <li><button onClick={() => navigateTo('matrix')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Compare Table</button></li>
+              <li><button onClick={() => navigateTo('pricing')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Pricing</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className={`font-semibold uppercase tracking-wider text-[11px] mb-3 ${headingText}`}>Trust &amp; Security</h4>
+            <h4 className={`font-semibold uppercase tracking-wider text-[11px] mb-3 ${headingText}`}>Safety</h4>
             <ul className="space-y-2">
-              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Security Architecture</button></li>
-              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>SOC-2 Type II</button></li>
-              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>HIPAA Compliance</button></li>
-              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Zero Retention Guarantee</button></li>
+              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Privacy &amp; Security</button></li>
+              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Device Storage</button></li>
+              <li><button onClick={() => navigateTo('trust')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Zero Tracking</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className={`font-semibold uppercase tracking-wider text-[11px] mb-3 ${headingText}`}>Resources</h4>
+            <h4 className={`font-semibold uppercase tracking-wider text-[11px] mb-3 ${headingText}`}>Help</h4>
             <ul className="space-y-2">
-              <li><button onClick={() => navigateTo('docs')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Gesture &amp; Stylus Guide</button></li>
-              <li><button onClick={() => navigateTo('docs')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Keyboard Shortcuts</button></li>
-              <li><button onClick={() => navigateTo('docs')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Grounded AI Verification</button></li>
-              <li><button onClick={() => navigateTo('admin')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>System Administration</button></li>
+              <li><button onClick={() => navigateTo('docs')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>How It Works</button></li>
+              <li><button onClick={() => navigateTo('docs')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>Keyboard &amp; Touch Shortcuts</button></li>
+              <li><button onClick={() => navigateTo('docs')} className={`transition ${isLight ? 'hover:text-slate-900' : 'hover:text-white'}`}>AI Assistant Guide</button></li>
             </ul>
           </div>
         </div>
