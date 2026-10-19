@@ -21,12 +21,14 @@ import {
   BookOpen,
   ShieldCheck,
   Sun,
-  Moon
+  Moon,
+  Download
 } from 'lucide-react';
 
-
 import { useAuth } from '../../context/AuthContext';
-import { useWorkspace, ProfessionalField } from '../../context/WorkspaceContext';
+import { useWorkspace } from '../../context/WorkspaceContext';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { InstallModal } from '../common/InstallModal';
 
 interface HeaderProps {
   onOpenAuth: () => void;
@@ -64,13 +66,13 @@ export const Header: React.FC<HeaderProps> = ({
     setSplitLayout,
     ghostLayerActive,
     toggleGhostLayer,
-    collaborators,
     isTabletLayout,
     appSettings,
     updateAppSettings
   } = useWorkspace();
 
-
+  const { isInstalled } = usePWAInstall();
+  const [isInstallOpen, setIsInstallOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -84,225 +86,223 @@ export const Header: React.FC<HeaderProps> = ({
     }, 2000);
   };
 
-  const cycleSplitLayout = () => {
-    if (splitLayout === '50/50') setSplitLayout('70/30');
-    else if (splitLayout === '70/30') setSplitLayout('30/70');
-    else if (splitLayout === '30/70') setSplitLayout('canvas-only');
-    else setSplitLayout('50/50');
-  };
-
   return (
-    <header className="h-14 ios-glass z-40 px-3 md:px-4 flex items-center justify-between border-b border-white/10 shrink-0 select-none">
-      {/* Brand & Segmented View Controls */}
-      <div className="flex items-center space-x-2.5 sm:space-x-3">
-        <div
-          onClick={() => setActiveView('landing')}
-          className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-apple-glow shrink-0 cursor-pointer hover:scale-105 transition"
-          title="Return to Home Page"
-        >
-          <Layers className="w-4 h-4 text-white" />
-        </div>
-        <div
-          className="flex items-center space-x-1.5 cursor-pointer"
-          onClick={() => setActiveView('landing')}
-        >
-          <span className="font-bold tracking-tight text-white text-base">Synapse</span>
-          <span className="hidden sm:inline text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 font-semibold tracking-wider uppercase">
-            {isTabletLayout ? 'Touch' : 'Pro'}
-          </span>
-        </div>
-
-        <div className="h-4 w-px bg-white/15 mx-1 hidden sm:block"></div>
-
-        {/* View Switcher Tabs */}
-        <nav className="flex p-0.5 rounded-xl bg-black/40 border border-white/10 text-xs font-semibold overflow-x-auto overflow-y-hidden max-w-[40vw] sm:max-w-[50vw] md:max-w-none no-scrollbar">
-          <button
-            onClick={() => setActiveView('dashboard')}
-            title="Dashboard — View your files and recent projects"
-            className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-              activeView === 'dashboard'
-                ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
-                : 'text-slate-400 hover:text-white'
-            }`}
+    <>
+      <header className="h-14 w-full ios-glass z-40 px-3 sm:px-4 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] flex items-center justify-between border-b border-white/10 shrink-0 select-none overflow-hidden">
+        {/* Left: Brand & Segmented View Controls */}
+        <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 min-w-0">
+          <div
+            onClick={() => setActiveView('landing')}
+            className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-apple-glow shrink-0 cursor-pointer hover:scale-105 active:scale-95 transition"
+            title="Return to Home Page"
           >
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveView('workspace')}
-            title="Reading Board — Read documents & organize visual notes"
-            className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-              activeView === 'workspace'
-                ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            <Layers className="w-4 h-4 text-white" />
+          </div>
+          <div
+            className="flex items-center space-x-1.5 cursor-pointer shrink-0"
+            onClick={() => setActiveView('landing')}
           >
-            Reading Board
-          </button>
-          <button
-            onClick={() => setActiveView('library')}
-            title="My Files — Browse your uploaded documents"
-            className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-              activeView === 'library'
-                ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            My Files
-          </button>
-          <button
-            onClick={() => setActiveView('matrix')}
-            title="Compare Table — Compare clauses and findings side-by-side"
-            className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-              activeView === 'matrix'
-                ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Compare
-          </button>
-          {canAccessAdmin && (
-            <button
-              onClick={() => setActiveView('admin')}
-              title="Admin Portal"
-              className={`hidden md:flex px-2.5 sm:px-3 py-1 rounded-lg transition items-center space-x-1 ${
-                activeView === 'admin'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm'
-                  : 'text-amber-400/70 hover:text-amber-300'
-              }`}
-            >
-              <Shield className="w-3 h-3 mr-1" />
-              <span>Admin</span>
-            </button>
-          )}
-        </nav>
-      </div>
+            <span className="font-bold tracking-tight text-white text-base">Synapse</span>
+            <span className="hidden sm:inline text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 font-semibold tracking-wider uppercase">
+              {isTabletLayout ? 'Touch' : 'Pro'}
+            </span>
+          </div>
 
+          <div className="h-4 w-px bg-white/15 mx-0.5 hidden sm:block shrink-0"></div>
 
-      {/* PROFESSIONAL FIELD PRESET SELECTOR (Plain English labels) */}
-      <div className="hidden lg:flex items-center space-x-1.5 p-1 rounded-xl bg-black/40 border border-white/10 text-xs">
-        <button
-          onClick={() => switchField('legal')}
-          className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-            activeField === 'legal' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-          }`}
-          title="Legal & Contracts Mode"
-        >
-          <Scale className="w-3 h-3 text-amber-400" />
-          <span>Legal</span>
-        </button>
-
-        <button
-          onClick={() => switchField('academic')}
-          className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-            activeField === 'academic' ? 'bg-blue-600/20 text-blue-300 border border-blue-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-          }`}
-          title="Study & Research Mode"
-        >
-          <GraduationCap className="w-3 h-3 text-blue-400" />
-          <span>Research</span>
-        </button>
-
-        <button
-          onClick={() => switchField('business')}
-          className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-            activeField === 'business' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-          }`}
-          title="Business & Finance Mode"
-        >
-          <Briefcase className="w-3 h-3 text-emerald-400" />
-          <span>Business</span>
-        </button>
-
-        <button
-          onClick={() => switchField('medical')}
-          className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
-            activeField === 'medical' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-semibold' : 'text-slate-400 hover:text-white'
-          }`}
-          title="Medical & Health Mode"
-        >
-          <Stethoscope className="w-3 h-3 text-rose-400" />
-          <span>Medical</span>
-        </button>
-      </div>
-
-      {/* ACTIVE DOCUMENT BADGE (Clean, subtle center indicator) */}
-      {selectedDoc && (
-        <div className="hidden md:flex items-center space-x-2 px-3 py-1 rounded-xl bg-black/30 border border-white/10 text-xs text-slate-300 max-w-sm truncate">
-          <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-          <span className="truncate font-medium">{selectedDoc.title}</span>
-          <span className="text-[10px] text-slate-500 font-mono shrink-0">
-            {selectedDoc.pages || selectedDoc.parsedPdf?.totalPages || 1}p
-          </span>
-        </div>
-      )}
-
-      {/* Right Header: Quick Tools Toggle & User Identity */}
-      <div className="flex items-center space-x-2">
-        {/* Quick Tools & Settings Trigger */}
-        <button
-          onClick={onOpenQuickSettings}
-          className="ios-glass-btn flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-blue-400"
-          title="Open Quick Settings (Theme, Split, Canvas Design, Font Size)"
-        >
-          <Sliders className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Settings</span>
-        </button>
-
-        {/* Light / Dark Mode Quick Toggle */}
-        <button
-          onClick={() => updateAppSettings({ theme: appSettings.theme === 'light' ? 'dark' : 'light' })}
-          className="ios-glass-btn p-1.5 text-slate-300 hover:text-white"
-          title={appSettings.theme === 'light' ? 'Switch to Night Mode (Dark)' : 'Switch to Day Mode (Light)'}
-        >
-          {appSettings.theme === 'light' ? (
-            <Moon className="w-4 h-4 text-indigo-400" />
-          ) : (
-            <Sun className="w-4 h-4 text-amber-400" />
-          )}
-        </button>
-
-        <div className="h-4 w-px bg-white/10 mx-1 hidden sm:block"></div>
-
-        {/* User Pill / Sign In Buttons */}
-        {currentUser ? (
-          <div className="flex items-center space-x-1">
+          {/* View Switcher Tabs (Fluid scrolling on narrow screens) */}
+          <nav className="flex p-0.5 rounded-xl bg-black/40 border border-white/10 text-xs font-semibold overflow-x-auto no-scrollbar shrink-0 max-w-[280px] sm:max-w-[360px] md:max-w-none">
             <button
               onClick={() => setActiveView('dashboard')}
-              className="ios-glass-btn flex items-center space-x-1.5 py-1 px-2.5 rounded-full"
-              title="Open Dashboard"
+              title="Dashboard — View your files and recent projects"
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
+                activeView === 'dashboard'
+                  ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
             >
-              <span className="hidden md:inline text-xs font-semibold text-slate-200">
-                {currentUser.name.split(' ')[0]}
-              </span>
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-500 flex items-center justify-center text-[10px] font-bold text-white shadow-apple-subtle">
-                {currentUser.name.charAt(0)}
-              </div>
+              Dashboard
             </button>
             <button
-              onClick={() => setShowLogoutConfirm(true)}
-              className="ios-glass-btn p-1.5 rounded-full text-slate-400 hover:text-rose-400"
-              title="Sign Out"
+              onClick={() => setActiveView('workspace')}
+              title="Reading Board — Read documents & organize visual notes"
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
+                activeView === 'workspace'
+                  ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
             >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-1.5">
-            <button
-              onClick={() => setActiveView('auth')}
-              className="ios-glass-btn px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white"
-            >
-              Log In
+              Reading Board
             </button>
             <button
-              onClick={() => setActiveView('auth')}
-              className="ios-glass-btn-primary px-3 py-1.5 text-xs font-bold"
+              onClick={() => setActiveView('library')}
+              title="My Files — Browse your uploaded documents"
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
+                activeView === 'library'
+                  ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
             >
-              Register
+              My Files
             </button>
-          </div>
-        )}
-      </div>
+            <button
+              onClick={() => setActiveView('matrix')}
+              title="Compare Table — Compare clauses and findings side-by-side"
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
+                activeView === 'matrix'
+                  ? 'bg-blue-600 text-white shadow-apple-glow font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Compare
+            </button>
+            {canAccessAdmin && (
+              <button
+                onClick={() => setActiveView('admin')}
+                title="Admin Portal"
+                className={`hidden md:flex px-2 sm:px-2.5 py-1 rounded-lg transition items-center space-x-1 ${
+                  activeView === 'admin'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm'
+                    : 'text-amber-400/70 hover:text-amber-300'
+                }`}
+              >
+                <Shield className="w-3 h-3 mr-1" />
+                <span>Admin</span>
+              </button>
+            )}
+          </nav>
+        </div>
+
+        {/* Center: Professional Field Preset Selector (Only on wide desktop to prevent iPad landscape clipping) */}
+        <div className="hidden xl:flex items-center space-x-1.5 p-1 rounded-xl bg-black/40 border border-white/10 text-xs shrink-0">
+          <button
+            onClick={() => switchField('legal')}
+            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
+              activeField === 'legal' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Legal & Contracts Mode"
+          >
+            <Scale className="w-3 h-3 text-amber-400" />
+            <span>Legal</span>
+          </button>
+
+          <button
+            onClick={() => switchField('academic')}
+            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
+              activeField === 'academic' ? 'bg-blue-600/20 text-blue-300 border border-blue-500/40 font-semibold' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Study & Research Mode"
+          >
+            <GraduationCap className="w-3 h-3 text-blue-400" />
+            <span>Research</span>
+          </button>
+
+          <button
+            onClick={() => switchField('business')}
+            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
+              activeField === 'business' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Business & Finance Mode"
+          >
+            <Briefcase className="w-3 h-3 text-emerald-400" />
+            <span>Business</span>
+          </button>
+
+          <button
+            onClick={() => switchField('medical')}
+            className={`px-2 py-1 rounded-lg transition flex items-center space-x-1 ${
+              activeField === 'medical' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-semibold' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Medical & Health Mode"
+          >
+            <Stethoscope className="w-3 h-3 text-rose-400" />
+            <span>Medical</span>
+          </button>
+        </div>
+
+        {/* Right Header: Actions, PWA Download, Theme & User */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+          {/* Download / Install Web App Pill Button */}
+          {!isInstalled && (
+            <button
+              onClick={() => setIsInstallOpen(true)}
+              className="ios-glass-btn flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 border-cyan-500/30 hover:border-cyan-500/60 transition"
+              title="Download Synapse App for iPad, Mac, or PC"
+            >
+              <Download className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Install</span>
+            </button>
+          )}
+
+          {/* Quick Tools & Settings Trigger */}
+          <button
+            onClick={onOpenQuickSettings}
+            className="ios-glass-btn flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-blue-400"
+            title="Open Quick Settings (Theme, Split, Canvas Design, Font Size)"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Settings</span>
+          </button>
+
+          {/* Light / Dark Mode Quick Toggle */}
+          <button
+            onClick={() => updateAppSettings({ theme: appSettings.theme === 'light' ? 'dark' : 'light' })}
+            className="ios-glass-btn p-1.5 text-slate-300 hover:text-white"
+            title={appSettings.theme === 'light' ? 'Switch to Night Mode (Dark)' : 'Switch to Day Mode (Light)'}
+          >
+            {appSettings.theme === 'light' ? (
+              <Moon className="w-4 h-4 text-indigo-400" />
+            ) : (
+              <Sun className="w-4 h-4 text-amber-400" />
+            )}
+          </button>
+
+          <div className="h-4 w-px bg-white/10 mx-0.5 hidden sm:block"></div>
+
+          {/* User Pill / Sign In Buttons */}
+          {currentUser ? (
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => setActiveView('dashboard')}
+                className="ios-glass-btn flex items-center space-x-1.5 py-1 px-2.5 rounded-full"
+                title="Open Dashboard"
+              >
+                <span className="hidden md:inline text-xs font-semibold text-slate-200">
+                  {currentUser.name.split(' ')[0]}
+                </span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-500 flex items-center justify-center text-[10px] font-bold text-white shadow-apple-subtle">
+                  {currentUser.name.charAt(0)}
+                </div>
+              </button>
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="ios-glass-btn p-1.5 rounded-full text-slate-400 hover:text-rose-400"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-1.5">
+              <button
+                onClick={() => setActiveView('auth')}
+                className="ios-glass-btn px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white"
+              >
+                Log In
+              </button>
+              <button
+                onClick={() => setActiveView('auth')}
+                className="ios-glass-btn-primary px-2.5 sm:px-3 py-1.5 text-xs font-bold"
+              >
+                Register
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* PWA Download / Install Modal */}
+      <InstallModal isOpen={isInstallOpen} onClose={() => setIsInstallOpen(false)} />
 
       {/* Logout Confirmation & Loader Modal */}
       {showLogoutConfirm && (
@@ -352,6 +352,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 };

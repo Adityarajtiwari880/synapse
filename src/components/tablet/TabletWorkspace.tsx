@@ -5,13 +5,10 @@ import {
   Columns,
   Sparkles,
   MessageSquareQuote,
-  PenTool,
-  Highlighter,
-  Eraser,
-  RotateCcw,
   Sliders,
   Share2,
-  HelpCircle
+  HelpCircle,
+  Maximize2
 } from 'lucide-react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { DocumentReader } from '../reader/DocumentReader';
@@ -32,6 +29,7 @@ export const TabletWorkspace: React.FC<TabletWorkspaceProps> = ({
 }) => {
   const { splitLayout, setSplitLayout, ghostLayerActive, toggleGhostLayer, appSettings } = useWorkspace();
   const [activeTab, setActiveTab] = useState<'split' | 'canvas' | 'reader'>('split');
+  const [isDockMinimized, setIsDockMinimized] = useState(false);
 
   const handleTabSwitch = (tab: 'split' | 'canvas' | 'reader') => {
     setActiveTab(tab);
@@ -40,33 +38,115 @@ export const TabletWorkspace: React.FC<TabletWorkspaceProps> = ({
     else setSplitLayout('reader-only');
   };
 
-  return (
-    <div className={`h-full w-full flex flex-col relative overflow-hidden ${appSettings.theme === 'light' ? 'bg-[#f4f6f9]' : 'bg-[#0c0d14]'}`}>
-      {/* TABLET TOP APP BAR */}
-      <div className="h-12 px-4 glass-panel border-b border-white/10 flex items-center justify-between shrink-0 select-none z-30">
-        <div className="flex items-center space-x-2">
-          <span className="font-bold text-sm tracking-tight text-white">Synapse Touch</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-medium">
-            iPadOS Optimized
-          </span>
-        </div>
+  const isLight = appSettings.theme === 'light';
 
-        <div className="flex items-center space-x-2">
+  return (
+    <div className={`h-full w-full flex flex-col relative overflow-hidden select-none ${
+      isLight ? 'bg-[#f4f6f9]' : 'bg-[#0c0d14]'
+    }`}>
+      {/* FULL-HEIGHT VIEWPORT: Maximize tablet/iPad reading & canvas area */}
+      <div className="flex-1 w-full h-full relative overflow-hidden flex">
+        {/* Document Reader Pane */}
+        {(activeTab === 'split' || activeTab === 'reader') && (
+          <div className={`${
+            activeTab === 'split' ? 'w-1/2' : 'w-full'
+          } h-full border-r ${isLight ? 'border-slate-200' : 'border-white/10'} shrink-0 relative transition-all duration-200 overflow-hidden`}>
+            <DocumentReader />
+          </div>
+        )}
+
+        {/* Spatial Infinite Canvas Pane */}
+        {(activeTab === 'split' || activeTab === 'canvas') && (
+          <div className="flex-1 h-full relative transition-all duration-200 overflow-hidden">
+            <SpatialCanvas />
+          </div>
+        )}
+      </div>
+
+      {/* FLOATING IPADOS LIQUID GLASS DOCK (Apple HIG Floating Pill Toolbar) */}
+      <div className="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-40 bottom-[calc(1rem+env(safe-area-inset-bottom))] pointer-events-auto">
+        <div className={`ios-glass px-2.5 sm:px-3 py-1.5 rounded-full shadow-2xl flex items-center space-x-1 sm:space-x-1.5 border transition-all duration-300 ${
+          isLight
+            ? 'bg-white/90 border-slate-300/80 shadow-slate-400/20'
+            : 'bg-[#10121d]/85 border-white/20 shadow-black/60'
+        }`}>
+          {/* Segmented Layout Switcher (Reader | Split 50/50 | Canvas) */}
+          <div className="flex items-center p-0.5 rounded-full bg-black/20 border border-white/10 text-xs">
+            <button
+              onClick={() => handleTabSwitch('reader')}
+              className={`px-3 py-1.5 rounded-full flex items-center space-x-1.5 text-xs font-semibold transition active:scale-95 ${
+                activeTab === 'reader'
+                  ? 'bg-blue-600 text-white shadow-apple-glow'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Reader View Only"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reader</span>
+            </button>
+
+            <button
+              onClick={() => handleTabSwitch('split')}
+              className={`px-3 py-1.5 rounded-full flex items-center space-x-1.5 text-xs font-semibold transition active:scale-95 ${
+                activeTab === 'split'
+                  ? 'bg-blue-600 text-white shadow-apple-glow'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Side-by-Side 50/50 Split (Default iPad Layout)"
+            >
+              <Columns className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Split 50/50</span>
+            </button>
+
+            <button
+              onClick={() => handleTabSwitch('canvas')}
+              className={`px-3 py-1.5 rounded-full flex items-center space-x-1.5 text-xs font-semibold transition active:scale-95 ${
+                activeTab === 'canvas'
+                  ? 'bg-blue-600 text-white shadow-apple-glow'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Infinite Spatial Canvas Only"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Canvas</span>
+            </button>
+          </div>
+
+          <div className="h-5 w-px bg-white/15 mx-1"></div>
+
+          {/* AI Ghost Layer Switcher */}
           <button
             onClick={toggleGhostLayer}
-            className={`px-2.5 py-1 rounded-xl text-xs flex items-center space-x-1.5 border transition ${
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition active:scale-95 border ${
               ghostLayerActive
-                ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300 shadow-ghost-glow'
-                : 'bg-white/5 border-white/10 text-slate-400'
+                ? 'bg-indigo-500/30 border-indigo-400/50 text-indigo-300 shadow-ghost-glow'
+                : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
             }`}
+            title="Toggle Ephemeral AI Ghost Suggestions"
           >
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="text-[11px]">AI Ghosts</span>
+            <span className="hidden md:inline">AI Ghost</span>
           </button>
 
+          {/* Ask AI Grounded Assistant */}
+          <button
+            onClick={onOpenChat}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-indigo-600/30 to-blue-600/30 hover:from-indigo-600/50 hover:to-blue-600/50 text-indigo-300 border border-indigo-400/30 flex items-center space-x-1.5 transition active:scale-95"
+            title="Ask AI Assistant about open documents"
+          >
+            <div className="relative">
+              <MessageSquareQuote className="w-3.5 h-3.5" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            </div>
+            <span>Ask AI</span>
+          </button>
+
+          <div className="h-5 w-px bg-white/15 mx-1 hidden sm:block"></div>
+
+          {/* Share & Quick Tools */}
           <button
             onClick={onOpenShare}
-            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition"
+            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition active:scale-95"
             title="Share & Collaborate"
           >
             <Share2 className="w-4 h-4" />
@@ -74,81 +154,20 @@ export const TabletWorkspace: React.FC<TabletWorkspaceProps> = ({
 
           <button
             onClick={onOpenQuickSettings}
-            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition"
-            title="Quick Customizer"
+            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition active:scale-95"
+            title="Quick Settings"
           >
             <Sliders className="w-4 h-4" />
           </button>
 
           <button
             onClick={onOpenGuide}
-            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-blue-400 border border-white/10 transition"
+            className="p-1.5 rounded-full text-blue-400 hover:text-blue-300 hover:bg-white/10 transition active:scale-95"
             title="Beginner Guide"
           >
             <HelpCircle className="w-4 h-4" />
           </button>
         </div>
-      </div>
-
-      {/* MAIN VIEWPORT */}
-      <div className="flex-1 relative overflow-hidden flex">
-        {/* Document Reader Pane */}
-        {(activeTab === 'split' || activeTab === 'reader') && (
-          <div className={`${activeTab === 'split' ? 'w-1/2' : 'w-full'} h-full border-r border-white/10 shrink-0 relative transition-all duration-200`}>
-            <DocumentReader />
-          </div>
-        )}
-
-        {/* Spatial Canvas Pane */}
-        {(activeTab === 'split' || activeTab === 'canvas') && (
-          <div className="flex-1 h-full relative transition-all duration-200">
-            <SpatialCanvas />
-          </div>
-        )}
-      </div>
-
-      {/* THUMB-FRIENDLY TABLET BOTTOM NAVIGATION BAR (APPLE HIG STYLE) */}
-      <div className="h-16 glass-panel border-t border-white/10 px-6 flex items-center justify-around shrink-0 z-40 select-none pb-1">
-        <button
-          onClick={() => handleTabSwitch('reader')}
-          className={`flex flex-col items-center space-y-1 transition ${
-            activeTab === 'reader' ? 'text-blue-400 scale-105' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <BookOpen className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Reader</span>
-        </button>
-
-        <button
-          onClick={() => handleTabSwitch('split')}
-          className={`flex flex-col items-center space-y-1 transition ${
-            activeTab === 'split' ? 'text-blue-400 scale-105' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Columns className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Split 50/50</span>
-        </button>
-
-        <button
-          onClick={() => handleTabSwitch('canvas')}
-          className={`flex flex-col items-center space-y-1 transition ${
-            activeTab === 'canvas' ? 'text-blue-400 scale-105' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Layers className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Canvas</span>
-        </button>
-
-        <button
-          onClick={onOpenChat}
-          className="flex flex-col items-center space-y-1 text-indigo-300 hover:text-indigo-200 transition"
-        >
-          <div className="relative">
-            <MessageSquareQuote className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-          </div>
-          <span className="text-[10px] font-medium">Ask AI</span>
-        </button>
       </div>
     </div>
   );

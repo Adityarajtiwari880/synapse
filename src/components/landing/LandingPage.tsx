@@ -22,14 +22,19 @@ import {
   FileDown,
   Quote,
   Sun,
-  Moon
+  Moon,
+  Download
 } from 'lucide-react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { InstallModal } from '../common/InstallModal';
 
 export const LandingPage: React.FC = () => {
   const { navigateTo, isTabletLayout, appSettings, updateAppSettings } = useWorkspace();
   const { isAuthenticated, currentUser } = useAuth();
+  const { isInstalled } = usePWAInstall();
+  const [isInstallOpen, setIsInstallOpen] = useState(false);
 
   const isLight = appSettings.theme === 'light';
   const toggleTheme = () => updateAppSettings({ theme: isLight ? 'dark' : 'light' });
@@ -87,6 +92,18 @@ export const LandingPage: React.FC = () => {
 
           {/* iOS Glass Controls: Day/Night Toggle, Log In & Register Buttons */}
           <div className="flex items-center space-x-2">
+            {/* Download / Install App Pill Button */}
+            {!isInstalled && (
+              <button
+                onClick={() => setIsInstallOpen(true)}
+                className="ios-glass-btn p-2 sm:px-3 sm:py-1.5 flex items-center space-x-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 border-cyan-500/30 hover:border-cyan-500/60 transition"
+                title="Download Synapse App for iPad, Mac, or PC"
+              >
+                <Download className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="hidden sm:inline">Install</span>
+              </button>
+            )}
+
             {/* Day / Night Toggle */}
             <button
               onClick={toggleTheme}
@@ -181,6 +198,15 @@ export const LandingPage: React.FC = () => {
               <FileText className="w-4 h-4 text-blue-500" />
               <span>Open Sample Document</span>
             </button>
+            {!isInstalled && (
+              <button
+                onClick={() => setIsInstallOpen(true)}
+                className="w-full sm:w-auto px-5 py-3.5 rounded-2xl ios-glass-btn font-semibold text-sm flex items-center justify-center space-x-2 cursor-pointer text-cyan-400 border-cyan-500/30 hover:border-cyan-500/60 transition"
+              >
+                <Download className="w-4 h-4 text-cyan-400" />
+                <span>Download App</span>
+              </button>
+            )}
           </div>
 
           {/* 4 Simple Value Stats */}
@@ -660,6 +686,9 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* PWA Download / Install Modal */}
+      <InstallModal isOpen={isInstallOpen} onClose={() => setIsInstallOpen(false)} />
     </div>
   );
 };

@@ -31,10 +31,13 @@ import {
   Monitor,
   Type,
   Zap,
-  HelpCircle
+  HelpCircle,
+  Download
 } from 'lucide-react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { InstallModal } from '../common/InstallModal';
 import { ProfessionalField, EnterpriseMatter, ProjectWorkflowMode } from '../../types';
 
 export const PersonalizedDashboard: React.FC = () => {
@@ -53,8 +56,10 @@ export const PersonalizedDashboard: React.FC = () => {
   } = useWorkspace();
 
   const { currentUser, canAccessAdmin } = useAuth();
+  const { isInstalled } = usePWAInstall();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -243,10 +248,10 @@ export const PersonalizedDashboard: React.FC = () => {
       />
 
       {/* TOP HEADER */}
-      <header className={`px-4 sm:px-6 py-3 border-b ios-glass flex items-center justify-between sticky top-0 z-30 ${
+      <header className={`px-3 sm:px-6 py-3 border-b ios-glass flex items-center justify-between sticky top-0 z-30 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] ${
         isLight ? 'border-slate-200' : 'border-white/10'
       }`}>
-        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigateTo('landing')}>
+        <div className="flex items-center space-x-3 cursor-pointer shrink-0" onClick={() => navigateTo('landing')}>
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-apple-glow shrink-0">
             <Layers className="w-4 h-4 text-white" />
           </div>
@@ -262,12 +267,24 @@ export const PersonalizedDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Global Controls: Theme Toggle, Upload, Workspace */}
-        <div className="flex items-center space-x-2 text-xs font-semibold">
+        {/* Global Controls: Theme Toggle, Upload, Workspace, PWA Install */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-semibold shrink-0">
+          {/* Download / Install App Pill Button */}
+          {!isInstalled && (
+            <button
+              onClick={() => setIsInstallModalOpen(true)}
+              className="ios-glass-btn px-2.5 sm:px-3 py-1.5 text-cyan-400 hover:text-cyan-300 border-cyan-500/30 hover:border-cyan-500/60 flex items-center space-x-1.5 transition"
+              title="Download Synapse Web App for iPad, Mac, or PC"
+            >
+              <Download className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Install App</span>
+            </button>
+          )}
+
           {/* Day / Night Mode Switcher Button */}
           <button
             onClick={toggleTheme}
-            className="ios-glass-btn px-3 py-1.5 flex items-center space-x-1.5"
+            className="ios-glass-btn px-2.5 sm:px-3 py-1.5 flex items-center space-x-1.5"
             title={isLight ? 'Switch to Night Mode (Dark)' : 'Switch to Day Mode (Light)'}
           >
             {isLight ? <Moon className="w-4 h-4 text-indigo-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
@@ -277,7 +294,7 @@ export const PersonalizedDashboard: React.FC = () => {
           {/* Upload Any PDF / Word Doc Quick Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="ios-glass-btn px-3 py-1.5 text-blue-500 flex items-center space-x-1.5"
+            className="ios-glass-btn px-2.5 sm:px-3 py-1.5 text-blue-500 flex items-center space-x-1.5"
             title="Upload any PDF or Word document"
           >
             <Upload className="w-3.5 h-3.5" />
@@ -839,6 +856,9 @@ export const PersonalizedDashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* PWA Download / Install Modal */}
+      <InstallModal isOpen={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} />
     </div>
   );
 };
