@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { DocumentItem } from '../types';
-import { parseDocumentFile, type ParsedDocumentResult } from '../services/pdfService';
+import type { ParsedDocumentResult } from '../services/pdfService';
 
 export function useDocuments(matterId: string | null, userId: string | null) {
   /**
@@ -10,7 +10,8 @@ export function useDocuments(matterId: string | null, userId: string | null) {
    */
   const uploadDocument = useCallback(
     async (file: File): Promise<(ParsedDocumentResult & { storageUrl?: string; fileType?: string }) | null> => {
-      // Always parse locally first (works offline too)
+      // Lazy-load parser to keep initial bundle tiny and fast for older iPads
+      const { parseDocumentFile } = await import('../services/pdfService');
       const parsed = await parseDocumentFile(file);
       const parsedWithExtras = parsed as ParsedDocumentResult & { storageUrl?: string; fileType?: string };
 

@@ -1,6 +1,10 @@
+// 1. Mandatory Polyfills for older iPads & Safari (must be first)
+import './polyfills';
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import './index.css';
 
 // Register PWA Service Worker for downloadable web app capabilities
@@ -16,8 +20,13 @@ if ('serviceWorker' in navigator && window.location.protocol.startsWith('http'))
   });
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </React.StrictMode>
+  );
+}

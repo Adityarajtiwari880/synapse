@@ -27,11 +27,13 @@ import { TrustCenter } from './components/trust/TrustCenter';
 import { DocsPage } from './components/docs/DocsPage';
 import { PricingPage } from './components/pricing/PricingPage';
 
+import { safeSessionStorage } from './lib/safeStorage';
+
 const MainWorkspaceContent: React.FC = () => {
   const { activeView, isTabletLayout, appSettings } = useWorkspace();
 
   const [isBooting, setIsBooting] = useState(() => {
-    return !sessionStorage.getItem('synapse_booted');
+    return !safeSessionStorage.getItem('synapse_booted');
   });
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -45,7 +47,7 @@ const MainWorkspaceContent: React.FC = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
 
   const handleBootComplete = () => {
-    sessionStorage.setItem('synapse_booted', 'true');
+    safeSessionStorage.setItem('synapse_booted', 'true');
     setIsBooting(false);
   };
 

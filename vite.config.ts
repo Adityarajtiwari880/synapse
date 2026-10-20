@@ -8,7 +8,7 @@ export default defineConfig({
     open: true
   },
   build: {
-    target: 'esnext',
+    target: ['es2020', 'safari14', 'ios14'],
     sourcemap: true
   }
 });

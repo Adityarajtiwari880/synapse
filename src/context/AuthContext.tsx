@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { safeStorage } from '../lib/safeStorage';
 import { User, Role, ActiveSession } from '../types';
 
 interface AuthContextType {
@@ -26,11 +27,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('synapse_users');
+    const saved = safeStorage.getItem('synapse_users');
     return saved ? JSON.parse(saved) : [];
   });
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(() => {
-    const saved = localStorage.getItem('synapse_sessions');
+    const saved = safeStorage.getItem('synapse_sessions');
     return saved ? JSON.parse(saved) : [];
   });
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
@@ -40,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isSupabaseConfigured) {
       // Local-only mode: restore from localStorage
-      const savedId = localStorage.getItem('synapse_current_user_id');
+      const savedId = safeStorage.getItem('synapse_current_user_id');
       if (savedId) {
         const match = users.find((u) => u.id === savedId);
         if (match) setCurrentUser(match);
@@ -130,13 +131,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ─── Persist local users ──────────────────────────────────
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      localStorage.setItem('synapse_users', JSON.stringify(users));
+      safeStorage.setItem('synapse_users', JSON.stringify(users));
     }
   }, [users]);
 
   useEffect(() => {
     if (!isSupabaseConfigured && currentUser) {
-      localStorage.setItem('synapse_current_user_id', currentUser.id);
+      safeStorage.setItem('synapse_current_user_id', currentUser.id);
     }
   }, [currentUser]);
 
@@ -237,7 +238,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setCurrentUser(guestUser);
     setSupabaseUserId(guestUser.id);
-    localStorage.setItem('synapse_current_user_id', guestUser.id);
+    safeStorage.setItem('synapse_current_user_id', guestUser.id);
   };
 
   // ─── LOGOUT ───────────────────────────────────────────────
@@ -247,7 +248,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setCurrentUser(null);
     setSupabaseUserId(null);
-    localStorage.removeItem('synapse_current_user_id');
+    safeStorage.removeItem('synapse_current_user_id');
   };
 
   // ─── Admin: role & status management ─────────────────────

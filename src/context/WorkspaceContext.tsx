@@ -16,7 +16,7 @@ import {
   EnterpriseMatter
 } from '../types';
 import { useAuth } from './AuthContext';
-import { parseDocumentFile } from '../services/pdfService';
+import { safeStorage } from '../lib/safeStorage';
 import { useMatters } from '../hooks/useMatters';
 import { useCanvas } from '../hooks/useCanvas';
 import { useDocuments } from '../hooks/useDocuments';
@@ -224,7 +224,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [collaborators] = useState<Collaborator[]>([]);
 
   const [appSettings, setAppSettings] = useState<AppSettings>(() => {
-    const saved = localStorage.getItem('synapse_app_settings');
+    const saved = safeStorage.getItem('synapse_app_settings');
     return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
   });
 
@@ -268,7 +268,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      localStorage.setItem('synapse_matters', JSON.stringify(matters));
+      safeStorage.setItem('synapse_matters', JSON.stringify(matters));
     }
   }, [matters]);
 
@@ -321,7 +321,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     (appSettings.deviceMode === 'auto' && isTouchHardware);
 
   useEffect(() => {
-    localStorage.setItem('synapse_app_settings', JSON.stringify(appSettings));
+    safeStorage.setItem('synapse_app_settings', JSON.stringify(appSettings));
   }, [appSettings]);
 
   const updateAppSettings = (partial: Partial<AppSettings>) => {
